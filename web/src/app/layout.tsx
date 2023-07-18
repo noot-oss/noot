@@ -3,7 +3,7 @@ import "~/styles/globals.css";
 import { Providers } from "~/app/providers";
 import { Navbar } from "~/components/Navbar";
 
-const RootLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" className="h-full dark">
       <body className="h-full">
