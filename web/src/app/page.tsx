@@ -1,15 +1,14 @@
+"use client";
 
-import {Button} from "@nextui-org/react";
+import { useSession } from "next-auth/react";
 
-const Home = () => {
+export default function Home() {
+  const session = useSession();
+
   return (
-    <div>
-      <h1>foo</h1>
-        <Button>
-            test
-        </Button>
+    <div className={"flex h-full flex-col items-center justify-center"}>
+      <h1 className="text-6xl font-bold">Welcome to Noot</h1>
+      Username: {session.data ? session.data.user.name : "Not logged in"}
     </div>
   );
-};
-
-export default Home;
+}

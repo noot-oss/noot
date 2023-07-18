@@ -1,18 +1,15 @@
-import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
+"use client";
 import "~/styles/globals.css";
 import { Providers } from "~/app/providers";
+import { Navbar } from "~/components/Navbar";
 
-const RootLayout: React.FC<
-  React.PropsWithChildren<{
-    session: Session | null;
-  }>
-> = ({ children, session }) => {
+const RootLayout: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   return (
-    <html lang="en">
-      <body>
-        <Providers session={session}>
-          <main>{children}</main>
+    <html lang="en" className="h-full dark">
+      <body className="h-full">
+        <Providers>
+          <Navbar />
+          <main className="grow">{children}</main>
         </Providers>
       </body>
     </html>
