@@ -2,10 +2,14 @@
 import "~/styles/globals.css";
 import { Providers } from "~/app/providers";
 import { Navbar } from "~/components/Navbar";
+import { useTheme } from "next-themes";
+import { api } from "~/utils/api";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
+  const { theme } = useTheme();
+
   return (
-    <html lang="en" className="h-full dark">
+    <html lang="en" className={`h-full ${theme ?? "dark"}`}>
       <body className="h-full">
         <Providers>
           <Navbar />
@@ -16,4 +20,4 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default RootLayout;
+export default api.withTRPC(RootLayout);

@@ -14,6 +14,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 
 /**
  * 1. CONTEXT
@@ -50,11 +51,11 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
+export const createTRPCContext = async (opts?: FetchCreateContextFnOptions) => {
+  const req = opts?.req;
 
   // Get the session from the server using the getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
+  const session = await getServerAuthSession();
 
   return createInnerTRPCContext({
     session,
