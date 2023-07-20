@@ -15,12 +15,6 @@ datasource db {
   url          = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
@@ -64,4 +58,36 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// box
+model Box {
+  id        String   @id @default(cuid())
+  name      String
+  ownerId   String
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BoxErrorLog {
+  sentryErrorId String   @unique
+  boxId         String
+  createdAt     DateTime @default(now())
+}
+
+model DataLog {
+  id        String   @id @default(cuid())
+  boxId     String
+  temp      Float
+  humidity  Float
+  co2       Float
+  createdAt DateTime @default(now())
+}
+
+model BoxActionLog {
+  id        String   @id @default(cuid())
+  boxId     String
+  action    String
+  createdAt DateTime @default(now())
 }
