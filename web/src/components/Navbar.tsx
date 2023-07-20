@@ -8,7 +8,7 @@ import {
 } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
 import { useSession } from "next-auth/react";
-import { Switch } from "@nextui-org/switch";
+// import { Switch } from "@nextui-org/switch";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -31,13 +31,13 @@ export const Navbar = () => {
       <NavbarContent>
         <NavbarItem>Noot</NavbarItem>
       </NavbarContent>
-      <Switch
-        className="mx-8"
-        defaultSelected={theme === "dark" ?? false}
-        // @ts-expect-error - incorrect typing
-        onValueChange={(e: boolean) => setTheme(e ? "dark" : "light")}
-        aria-label={"Toggle theme"}
-      />
+      {/*<Switch*/}
+      {/*  className="mx-8"*/}
+      {/*  defaultSelected={theme === "dark" ?? false}*/}
+      {/*  // @ts-expect-error - incorrect typing*/}
+      {/*  onValueChange={(e: boolean) => setTheme(e ? "dark" : "light")}*/}
+      {/*  aria-label={"Toggle theme"}*/}
+      {/*/>*/}
       <NavbarContent className={"ml-auto"}>
         <NavbarItem>
           {session.data ? (
