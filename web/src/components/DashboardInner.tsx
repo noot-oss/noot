@@ -1,5 +1,6 @@
 import { type UserBoxReturned } from "~/server/api/routers/boxWebRouter";
 import { Button } from "@nextui-org/button";
+import Link from "next/link";
 
 interface DashboardInnerProps {
   userBoxes: UserBoxReturned[];
@@ -21,6 +22,8 @@ const NoBoxesFound = (props: { userName: DashboardInnerProps["userName"] }) => {
         variant="shadow"
         color="primary"
         size="lg"
+        as={Link}
+        href="/create"
       >
         Create Box
       </Button>

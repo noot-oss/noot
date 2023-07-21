@@ -13,7 +13,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body className="h-full">
         <Providers>
           <Navbar />
-          <main className="grow">{children}</main>
+          <main className="mx-4 my-16 grow lg:mx-16">{children}</main>
         </Providers>
       </body>
     </html>

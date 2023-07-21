@@ -8,3 +8,16 @@
     display: flex;
     flex-direction: column;
 }
+
+/*https://www.geeksforgeeks.org/how-to-hide-number-input-spin-box-using-css/*/
+/* For Chrome and Safari  */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button
+{
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* For Firefox  */
+input[type="number"] {
+    -moz-appearance: textfield;
+}

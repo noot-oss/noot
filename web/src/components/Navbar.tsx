@@ -5,12 +5,13 @@ import {
   NavbarContent,
   Navbar as NavbarNextUI,
   NavbarItem,
-} from "@nextui-org/navbar";
-import { Link } from "@nextui-org/link";
+  Switch,
+  Button,
+} from "@nextui-org/react";
 import { useSession } from "next-auth/react";
-// import { Switch } from "@nextui-org/switch";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export const Navbar = () => {
   const [mounted, setMounted] = useState(false);
@@ -26,25 +27,43 @@ export const Navbar = () => {
   }
 
   return (
-    <NavbarNextUI position={"sticky"}>
-      <NavbarBrand></NavbarBrand>
-      <NavbarContent>
-        <NavbarItem>Noot</NavbarItem>
-      </NavbarContent>
-      {/*<Switch*/}
-      {/*  className="mx-8"*/}
-      {/*  defaultSelected={theme === "dark" ?? false}*/}
-      {/*  // @ts-expect-error - incorrect typing*/}
-      {/*  onValueChange={(e: boolean) => setTheme(e ? "dark" : "light")}*/}
-      {/*  aria-label={"Toggle theme"}*/}
-      {/*/>*/}
-      <NavbarContent className={"ml-auto"}>
+    <NavbarNextUI>
+      <Link href="/">
+        <NavbarBrand>
+          {/*<AcmeLogo />*/}
+          <p className="font-bold text-inherit">Noot</p>
+        </NavbarBrand>
+      </Link>
+
+      <NavbarContent justify="end">
         <NavbarItem>
           {session.data ? (
-            <Link href={"/api/auth/signout"}>Sign out</Link>
+            <Button
+              as={Link}
+              color="primary"
+              href="/api/auth/signout"
+              variant="flat"
+            >
+              Sign Out
+            </Button>
           ) : (
-            <Link href={"/api/auth/signin"}>Sign in</Link>
+            <Button
+              as={Link}
+              color="primary"
+              href="/api/auth/signin"
+              variant="flat"
+            >
+              Sign In
+            </Button>
           )}
+        </NavbarItem>
+        <NavbarItem>
+          <Switch
+            className="mx-8"
+            defaultSelected={theme === "dark" ?? false}
+            onValueChange={(e: boolean) => setTheme(e ? "dark" : "light")}
+            aria-label={"Toggle theme"}
+          />
         </NavbarItem>
       </NavbarContent>
     </NavbarNextUI>
