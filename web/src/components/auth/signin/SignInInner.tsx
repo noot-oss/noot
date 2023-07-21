@@ -27,7 +27,7 @@ export const SignInInner = (props: SIgnInInnerProps) => {
     return <div>Providers not found</div>;
   }
 
-  if (session.data) router.push(props.callbackUrl);
+  if (session.data) router.push("/");
 
   if (!providers) return <div>Providers not found</div>;
 
