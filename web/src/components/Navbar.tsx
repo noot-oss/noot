@@ -50,7 +50,7 @@ export const Navbar = () => {
             <Button
               as={Link}
               color="primary"
-              href="/api/auth/signin"
+              href="/auth/signin"
               variant="flat"
             >
               Sign In
