@@ -11,7 +11,7 @@ export interface SIgnInInnerProps {
 
 type ProvidersReturned = Awaited<ReturnType<typeof getProviders>>;
 
-export const SignInInner = (props: SIgnInInnerProps) => {
+export const SignInInner = () => {
   const session = useSession();
   const router = useRouter();
 
