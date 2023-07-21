@@ -1,6 +1,6 @@
 import { type UserBoxReturned } from "~/server/api/routers/boxWebRouter";
-import { Button } from "@nextui-org/button";
 import Link from "next/link";
+import { Button } from "@nextui-org/react";
 
 interface DashboardInnerProps {
   userBoxes: UserBoxReturned[];

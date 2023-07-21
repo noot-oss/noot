@@ -1,20 +1,17 @@
 "use client";
 import "~/styles/globals.css";
+import { api } from "~/utils/api";
+import { LayoutWithoutNav } from "~/components/layout/Layouts";
 import { Providers } from "~/app/providers";
 import { Navbar } from "~/components/Navbar";
 import { useTheme } from "next-themes";
-import { api } from "~/utils/api";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const { theme } = useTheme();
-
   return (
     <html lang="en" className={`h-full ${theme ?? "dark"}`}>
       <body className="h-full">
-        <Providers>
-          <Navbar />
-          <main className="mx-4 my-16 grow lg:mx-16">{children}</main>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
