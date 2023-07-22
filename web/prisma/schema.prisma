@@ -70,6 +70,13 @@ model Box {
   updatedAt DateTime @updatedAt
 }
 
+model BoxInit {
+  verificationCode String
+  boxId            String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  ip               String
+}
+
 model BoxErrorLog {
   sentryErrorId String   @unique
   boxId         String
