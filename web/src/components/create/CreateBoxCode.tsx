@@ -1,17 +1,31 @@
 "use client";
 
 import { Button, Input } from "@nextui-org/react";
-import { createRef, useEffect, useState } from "react";
+import {
+  createRef,
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { z } from "zod";
 
-const CODEINPUT_LENGTH = 8;
+const CODEINPUT_LENGTH = 9;
 
 const codeSchema = z.object({
-  code: z.string().min(0).max(9),
+  code: z
+    .string()
+    .min(CODEINPUT_LENGTH - 1)
+    .max(CODEINPUT_LENGTH - 1),
 });
 
-const CodeInput = () => {
-  const [code, setCode] = useState<string[]>(Array.from({ length: 8 }));
+interface CodeInputProps {
+  code: string[];
+  setCode: Dispatch<SetStateAction<string[]>>;
+  isValid: boolean;
+}
+
+const CodeInput = (props: CodeInputProps) => {
   const [refs, setRefs] = useState<React.RefObject<HTMLInputElement>[]>([]);
 
   useEffect(() => {
@@ -21,8 +35,11 @@ const CodeInput = () => {
   }, []);
 
   return (
-    <div className={"grid grid-cols-8 gap-8"}>
+    <div className={"grid grid-cols-9 gap-8"}>
       {Array.from({ length: CODEINPUT_LENGTH }).map((_, i) => {
+        if (i === 4)
+          return <div className={"mx-auto w-1 rounded-full bg-white/50"}></div>;
+
         return (
           <Input
             key={i}
@@ -31,6 +48,7 @@ const CodeInput = () => {
             max="10"
             pattern={"[0-9]*"}
             size={"lg"}
+            validationState={props.isValid ? "valid" : "invalid"}
             classNames={{
               input: "text-center text-4xl font-bold",
               inputWrapper: "w-16 h-32",
@@ -38,11 +56,14 @@ const CodeInput = () => {
             variant={"bordered"}
             ref={refs[i]}
             placeholder={"0"}
-            value={code[i] ?? "0"}
+            value={props.code[i] ?? "0"}
             onKeyDown={(e) => {
-              e.preventDefault();
+              if (e.key !== "Tab") {
+                e.preventDefault();
+              }
+
               if (e.key.match(/[0-9]/)) {
-                setCode((prev) => {
+                props.setCode((prev) => {
                   return prev.map((v, index) => {
                     if (index === i) {
                       return e.key;
@@ -52,13 +73,16 @@ const CodeInput = () => {
                   });
                 });
 
-                if (i < CODEINPUT_LENGTH - 1) {
-                  refs[i + 1]?.current?.focus();
+                if (i > CODEINPUT_LENGTH - 1) return;
+
+                if (i === 3) {
+                  return refs[i + 2]?.current?.focus();
                 }
+                return refs[i + 1]?.current?.focus();
               }
 
               if (e.key === "Backspace") {
-                setCode((prev) => {
+                props.setCode((prev) => {
                   return prev.map((v, index) => {
                     if (index === i) {
                       return "";
@@ -68,9 +92,11 @@ const CodeInput = () => {
                   });
                 });
 
-                if (i > 0) {
-                  refs[i - 1]?.current?.focus();
+                if (i === 0) return;
+                if (i === 5) {
+                  return refs[i - 2]?.current?.focus();
                 }
+                return refs[i - 1]?.current?.focus();
               }
             }}
           />
@@ -81,22 +107,32 @@ const CodeInput = () => {
 };
 
 export const CreateBoxCode = () => {
-  const [code, setCode] = useState("");
-  const [isValid, setIsValid] = useState(false);
+  const [code, setCode] = useState<string[]>(
+    Array.from({ length: CODEINPUT_LENGTH })
+  );
+  const [isValid, setIsValid] = useState(true);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   useEffect(() => {
-    const isSchemaValid = codeSchema.safeParse({ code }).success;
-
-    setIsValid(isSchemaValid);
-  }, [code]);
+    if (submitAttempted) {
+      setIsValid(codeSchema.safeParse({ code: code.join("") }).success);
+    }
+  }, [code, submitAttempted]);
 
   return (
     <div className="mt-8 flex flex-col gap-8 lg:mt-32">
       <h2 className="text-2xl">Enter Box Code</h2>
 
-      <CodeInput />
+      <CodeInput code={code} setCode={setCode} isValid={isValid} />
 
-      <Button variant="solid" size="lg" color="primary">
+      <Button
+        variant="solid"
+        size="lg"
+        color="primary"
+        onPress={() => {
+          setSubmitAttempted(true);
+        }}
+      >
         Continue
       </Button>
     </div>
