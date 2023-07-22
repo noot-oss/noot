@@ -1,5 +1,6 @@
 import { boxWebRouter } from "~/server/api/routers/boxWebRouter";
 import { createTRPCRouter } from "~/server/api/trpc";
+import { externalRouter } from "~/server/api/routers/externalRouter";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   box: boxWebRouter,
+  external: externalRouter,
 });
 
 // export type definition of API

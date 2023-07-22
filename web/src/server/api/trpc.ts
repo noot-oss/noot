@@ -26,6 +26,8 @@ import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 
 interface CreateContextOptions {
   session: Session | null;
+  boxToken: string | null | undefined;
+  ip: string | null;
 }
 
 /**
@@ -42,6 +44,8 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    boxToken: opts.boxToken,
+    ip: opts.ip,
   };
 };
 
@@ -51,14 +55,18 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts?: FetchCreateContextFnOptions) => {
-  const req = opts?.req;
+export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
+  const req = opts.req;
+  const boxToken = opts?.req.headers.get("box-token");
+  const ip = req.headers.get("x-forwarded-for");
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession();
 
   return createInnerTRPCContext({
     session,
+    boxToken,
+    ip,
   });
 };
 
@@ -129,3 +137,13 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+const enforceBoxHasToken = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.boxToken) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next();
+});
+
+export const boxTokenProtectedProcedure = t.procedure.use(enforceBoxHasToken);
