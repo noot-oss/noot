@@ -15,6 +15,8 @@ import { ZodError } from "zod";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 /**
  * 1. CONTEXT
@@ -145,5 +147,27 @@ const enforceBoxHasToken = t.middleware(async ({ ctx, next }) => {
 
   return next();
 });
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "5 s"),
+  prefix: "@upstash/ratelimit",
+});
+
+const enforceRateLimit = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.ip) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  const { success } = await ratelimit.limit(ctx.ip);
+
+  if (!success) {
+    throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
+  }
+
+  return next();
+});
+
+export const rateLimitedPublicProcedure = publicProcedure.use(enforceRateLimit);
 
 export const boxTokenProtectedProcedure = t.procedure.use(enforceBoxHasToken);
