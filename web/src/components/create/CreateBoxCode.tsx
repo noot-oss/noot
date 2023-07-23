@@ -5,10 +5,12 @@ import {
   createRef,
   type Dispatch,
   type SetStateAction,
+  useCallback,
   useEffect,
   useState,
 } from "react";
 import { z } from "zod";
+import { api } from "~/utils/api";
 
 const CODEINPUT_LENGTH = 9;
 
@@ -38,11 +40,16 @@ const CodeInput = (props: CodeInputProps) => {
     <div className={"grid grid-cols-9 gap-8"}>
       {Array.from({ length: CODEINPUT_LENGTH }).map((_, i) => {
         if (i === 4)
-          return <div className={"mx-auto w-1 rounded-full bg-white/50"}></div>;
+          return (
+            <div
+              className={"mx-auto w-1 rounded-full bg-white/50"}
+              key={`codeInput-${i}`}
+            ></div>
+          );
 
         return (
           <Input
-            key={i}
+            key={`codeInput-${i}`}
             type="number"
             min="0"
             max="10"
@@ -112,12 +119,31 @@ export const CreateBoxCode = () => {
   );
   const [isValid, setIsValid] = useState(true);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const { error, refetch, isFetching } = api.box.getBoxFromCode.useQuery(
+    {
+      code: code.join(""),
+    },
+    {
+      enabled: false,
+      retry: false,
+    }
+  );
 
   useEffect(() => {
     if (submitAttempted) {
       setIsValid(codeSchema.safeParse({ code: code.join("") }).success);
+      setButtonDisabled(false);
     }
   }, [code, submitAttempted]);
+
+  const handleContinueButtonClick = useCallback(async () => {
+    setSubmitAttempted(true);
+
+    if (!isValid || code.join("") === "") return;
+    setButtonDisabled(true);
+    void (await refetch());
+  }, [code, isValid, refetch]);
 
   return (
     <div className="mt-8 flex flex-col gap-8 lg:mt-32">
@@ -129,12 +155,23 @@ export const CreateBoxCode = () => {
         variant="solid"
         size="lg"
         color="primary"
-        onPress={() => {
-          setSubmitAttempted(true);
-        }}
+        isDisabled={buttonDisabled}
+        onPress={() => void handleContinueButtonClick()}
+        isLoading={isFetching}
       >
         Continue
       </Button>
+      {error?.message === "NOT_FOUND" && (
+        <div className="mx-auto text-center text-2xl font-bold text-red-500">
+          We couldn{"'"}t find a box with that code, please ensure codes are
+          matching!
+        </div>
+      )}
+      {error?.message === "TOO_MANY_REQUESTS" && (
+        <div className="mx-auto text-center text-2xl font-bold text-red-500">
+          Too many requests, please try again later!
+        </div>
+      )}
     </div>
   );
 };

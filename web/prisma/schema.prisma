@@ -71,7 +71,7 @@ model Box {
 }
 
 model BoxInit {
-  verificationCode String
+  verificationCode String   @unique
   boxId            String   @id @default(cuid())
   createdAt        DateTime @default(now())
   ip               String

@@ -17,6 +17,7 @@ import { prisma } from "~/server/db";
 import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { env } from "~/env.mjs";
 
 /**
  * 1. CONTEXT
@@ -150,11 +151,14 @@ const enforceBoxHasToken = t.middleware(async ({ ctx, next }) => {
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, "5 s"),
+  limiter: Ratelimit.slidingWindow(1, "55 s"),
   prefix: "@upstash/ratelimit",
+  analytics: true,
 });
 
 const enforceRateLimit = t.middleware(async ({ ctx, next }) => {
+  if (env.NODE_ENV === "development") return next();
+
   if (!ctx.ip) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
@@ -168,6 +172,10 @@ const enforceRateLimit = t.middleware(async ({ ctx, next }) => {
   return next();
 });
 
-export const rateLimitedPublicProcedure = publicProcedure.use(enforceRateLimit);
+export const rateLimitedProcedure = t.procedure.use(enforceRateLimit);
+
+export const rateLimitedProtectedProcedure = t.procedure
+  .use(enforceRateLimit)
+  .use(enforceUserIsAuthed);
 
 export const boxTokenProtectedProcedure = t.procedure.use(enforceBoxHasToken);

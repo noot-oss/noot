@@ -1,4 +1,10 @@
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  rateLimitedProcedure,
+} from "~/server/api/trpc";
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 export const boxWebRouter = createTRPCRouter({
   getUserBoxes: protectedProcedure.query(async ({ ctx }) => {
@@ -15,6 +21,27 @@ export const boxWebRouter = createTRPCRouter({
       updatedAt: box.updatedAt,
     })) satisfies UserBoxReturned[];
   }),
+  getBoxFromCode: rateLimitedProcedure
+    .input(
+      z.object({
+        code: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const initBox = await ctx.prisma.boxInit.findUnique({
+        where: {
+          verificationCode: input.code,
+        },
+      });
+
+      if (!initBox) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return {
+        boxId: initBox.boxId,
+      };
+    }),
 });
 
 export interface UserBoxReturned {
