@@ -27,7 +27,7 @@ export const Navbar = () => {
   }
 
   return (
-    <NavbarNextUI>
+    <NavbarNextUI isBordered>
       <Link href="/">
         <NavbarBrand>
           {/*<AcmeLogo />*/}
