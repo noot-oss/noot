@@ -14,7 +14,11 @@
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "paths": {
+      "~web/*": ["./apps/web/src/*"]
+    },
+    "baseUrl": "../../"
   },
   "exclude": ["node_modules"]
 }

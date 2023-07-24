@@ -1,17 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ESNext",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-    "module": "ESNext",                                /* Specify what module code is generated. */
-    "moduleResolution": "Node",
-    // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
-    // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
-    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
-    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
-    "strict": true,                                      /* Enable all strict type-checking options. */
-     "noImplicitAny": true,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
-     "strictNullChecks": true,                         /* When type checking, take into account 'null' and 'undefined'. */
-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
-  }
+    "target": "ESNext",
+    "module": "ESNext"
+  },
+  "extends": "../../packages/tsconfig/base.json"
 }
