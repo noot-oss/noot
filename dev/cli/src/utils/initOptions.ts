@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import inquirer from "inquirer";
+import { choices } from "./choice.js";
 
 export const initOptions = () => {
   console.log(chalk.blueBright("Welcome to the NootBox Development CLI"));
@@ -25,6 +26,8 @@ export const initOptions = () => {
       },
     ])
     .then((onSelect) => {
-      console.log(onSelect.initOptions);
+      choices
+        .find((choice) => choice.handlerId === onSelect.initOptions)
+        ?.callBack();
     });
 };
