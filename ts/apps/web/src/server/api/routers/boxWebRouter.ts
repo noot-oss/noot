@@ -2,9 +2,11 @@ import {
   createTRPCRouter,
   protectedProcedure,
   rateLimitedProcedure,
+  rateLimitedProtectedProcedure,
 } from "~/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import crypto from "node:crypto";
 
 export const boxWebRouter = createTRPCRouter({
   getUserBoxes: protectedProcedure.query(async ({ ctx }) => {
@@ -21,27 +23,27 @@ export const boxWebRouter = createTRPCRouter({
       updatedAt: box.updatedAt,
     })) satisfies UserBoxReturned[];
   }),
-  getBoxFromCode: rateLimitedProcedure
-    .input(
-      z.object({
-        code: z.string(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const initBox = await ctx.prisma.boxInit.findUnique({
-        where: {
-          verificationCode: input.code,
-        },
+  createBoxCode: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.ip) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
       });
+    }
 
-      if (!initBox) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
+    const EightDigitCode = crypto.randomInt(10000000, 99999999);
 
-      return {
-        boxId: initBox.boxId,
-      };
-    }),
+    const boxInit = await ctx.prisma.boxInit.create({
+      data: {
+        verificationCode: EightDigitCode.toString(),
+        creatorIp: ctx.ip,
+        creatorId: ctx.session.user.id,
+      },
+    });
+
+    return {
+      verificationCode: boxInit.verificationCode,
+    };
+  }),
 });
 
 export interface UserBoxReturned {
