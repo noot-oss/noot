@@ -14,5 +14,8 @@
     "turbo": "latest"
   },
   "packageManager": "pnpm@8.6.10",
-  "name": "ts"
+  "name": "ts",
+  "dependencies": {
+    "@nextui-org/react": "0.0.0-dev-v2-20230725193627"
+  }
 }
