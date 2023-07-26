@@ -74,7 +74,8 @@ model BoxInit {
   verificationCode String   @unique
   boxId            String   @id @default(cuid())
   createdAt        DateTime @default(now())
-  ip               String
+  creatorIp        String
+  creatorId        String
 }
 
 model BoxErrorLog {
