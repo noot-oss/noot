@@ -35,7 +35,6 @@ export const boxWebRouter = createTRPCRouter({
     const boxInit = await ctx.prisma.boxInit.create({
       data: {
         verificationCode: EightDigitCode.toString(),
-        creatorIp: ctx.ip,
         creatorId: ctx.session.user.id,
       },
     });
