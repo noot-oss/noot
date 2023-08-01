@@ -23,7 +23,6 @@
     "@trpc/server": "^10.26.0",
     "@upstash/ratelimit": "^0.4.3",
     "@upstash/redis": "^1.22.0",
-    "bcrypt": "^5.1.0",
     "framer-motion": "^10.12.22",
     "next": "^13.4.10",
     "next-auth": "^4.22.1",
@@ -36,7 +35,6 @@
   },
   "devDependencies": {
     "@nextui-org/theme": "link:../../node_modules/@nextui-org/theme",
-    "@types/bcrypt": "^5.0.0",
     "@types/eslint": "^8.37.0",
     "@types/node": "^18.16.0",
     "@types/prettier": "^2.7.2",
@@ -45,16 +43,16 @@
     "@typescript-eslint/eslint-plugin": "6.0.0",
     "@typescript-eslint/parser": "6.0.0",
     "autoprefixer": "^10.4.14",
+    "aws-cdk-lib": "2.84.0",
+    "constructs": "10.1.156",
     "eslint": "^8.40.0",
     "eslint-config-next": "^13.4.2",
     "postcss": "^8.4.21",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.2.8",
     "prisma": "^5.0.0",
-    "tailwindcss": "^3.3.0",
     "sst": "^2.22.9",
-    "aws-cdk-lib": "2.84.0",
-    "constructs": "10.1.156"
+    "tailwindcss": "^3.3.0"
   },
   "ct3aMetadata": {
     "initVersion": "7.16.0"
