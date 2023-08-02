@@ -1,5 +1,8 @@
 "use client";
 
+// Unused component
+// TODO: Split into multiple components
+
 import { Button, Input } from "@nextui-org/react";
 import {
   createRef,
@@ -120,15 +123,11 @@ export const CreateBoxCode = () => {
   const [isValid, setIsValid] = useState(true);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
-  const { error, refetch, isFetching } = api.box.getBoxFromCode.useQuery(
-    {
-      code: code.join(""),
-    },
-    {
-      enabled: false,
-      retry: false,
-    }
-  );
+  const { error, refetch, isFetching } = {
+    error: null,
+    refetch: async () => {},
+    isFetching: false,
+  };
 
   useEffect(() => {
     if (submitAttempted) {
