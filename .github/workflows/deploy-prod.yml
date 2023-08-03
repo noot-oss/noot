@@ -34,8 +34,8 @@ jobs:
 
     - name: Install deps
       run: pnpm install
-      working-directory: "./ts/apps/web"
+      working-directory: "ts/apps/web"
 
     - name: Deploy
       run: pnpm sst deploy --stage prod
-      working-directory: ./ts/apps/web
+      working-directory: "ts/apps/web"
