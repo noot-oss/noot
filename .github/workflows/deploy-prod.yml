@@ -17,7 +17,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        role-to-assume: arn:aws:iam::123456789100:role/my-github-actions-role
+        role-to-assume: arn:aws:iam::030878269276:role/gh_auth
         aws-region: eu-west-2
     
     - name: Setup Node.js
