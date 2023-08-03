@@ -1,6 +1,10 @@
 name: "Deploy to AWS via SST"
 on: [push]
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
 jobs:
   deploy_job:
     name: Deploy Website
@@ -9,6 +13,12 @@ jobs:
     steps:
     - name: Checkout (GitHub)
       uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::123456789100:role/my-github-actions-role
+        aws-region: eu-west-2
     
     - name: Setup Node.js
       uses: actions/setup-node@v3
