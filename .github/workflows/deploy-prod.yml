@@ -1,4 +1,4 @@
-name: "Deploy to AWS via SST"
+name: "Deploy to AWS via SST "
 on: [push]
 
 permissions:
