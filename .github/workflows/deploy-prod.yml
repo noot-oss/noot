@@ -1,0 +1,24 @@
+name: "Deploy to AWS via SST"
+on: [push]
+
+jobs:
+  deploy_job:
+    name: Deploy Website
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+
+    - name: Install deps
+      run: pnpm install
+      working-directory: ./ts/apps/web
+
+    - name: Deploy
+      run: pnpm sst deploy --stage prod
+      working-directory: ./ts/apps/web
