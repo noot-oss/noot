@@ -1,24 +1,62 @@
 name: "Deploy to AWS via SST"
 on: [push]
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
 jobs:
   deploy_job:
     name: Deploy Website
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout (GitHub)
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::030878269276:role/gh_auth
+        aws-region: eu-west-2
+    
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: 20
-
+        
     - name: Install pnpm
       uses: pnpm/action-setup@v2
+      with:
+        version: 7
+        run_install: false
+        package_json_file: "./ts/apps/web/package.json"
+
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
     - name: Install deps
       run: pnpm install
-      working-directory: ./ts/apps/web
+      working-directory: "ts/apps/web"
 
     - name: Deploy
       run: pnpm sst deploy --stage prod
-      working-directory: ./ts/apps/web
+      working-directory: "ts/apps/web"
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+        NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+        DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
+        DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
+        UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+        UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
