@@ -1,9 +1,7 @@
 "use client";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
-import { LayoutWithoutNav } from "~/components/layout/Layouts";
 import { Providers } from "~/app/providers";
-import { Navbar } from "~/components/Navbar";
 import { useTheme } from "next-themes";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
