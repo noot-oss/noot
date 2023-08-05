@@ -1,8 +1,8 @@
 "use client";
 
 import { api } from "~web/utils/api";
-import { DashboardInner } from "~web/components/DashboardInner";
 import { useSession } from "next-auth/react";
+import { DashboardInnerPage } from "@noot/ui/src/pages/Dashboard/DashboardInnerPage";
 
 const Dashboard = () => {
   const user = useSession();
@@ -11,12 +11,17 @@ const Dashboard = () => {
     refetchOnWindowFocus: false,
   });
 
+  const boxesToRender = userBoxes.data.map((box) => ({
+    id: box.id,
+    name: box.name,
+    description: "Box description",
+    added: box.createdAt,
+    updated: box.updatedAt,
+  }));
+
   return (
     <div className={"h-full"}>
-      <DashboardInner
-        userBoxes={userBoxes.data ?? []}
-        userName={user.data?.user?.name ?? "Unknown user"}
-      />
+      <DashboardInnerPage userBoxes={userBoxes.data ? boxesToRender : []} />
     </div>
   );
 };
