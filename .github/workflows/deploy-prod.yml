@@ -54,10 +54,7 @@ jobs:
 
     - name: Set outputs
       id: vars
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-    - name: Check outputs
-      run: echo ${{ steps.vars.outputs.sha_short }}
-      
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Deploy
       run: pnpm sst deploy --stage prod
