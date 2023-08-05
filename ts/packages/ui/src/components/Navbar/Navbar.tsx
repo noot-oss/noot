@@ -1,14 +1,13 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, SessionContextValue } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "~ui/components/Button";
 import { SignInOutInner } from "~ui/components/Navbar/SignInOutInner";
-
 export const NavbarInner = (props: {
   theme: string;
   setTheme: (theme: "dark" | "light") => void;
-  session?: ReturnType<typeof useSession>;
+  session?: SessionContextValue;
 }) => {
   const sessionHooked = useSession();
   const session = props.session ? props.session : sessionHooked;

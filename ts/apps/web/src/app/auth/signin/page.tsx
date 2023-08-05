@@ -1,4 +1,4 @@
-import { SignInInner } from "~/components/auth/signin/SignInInner";
+import { SignInInner } from "~web/components/auth/signin/SignInInner";
 
 const SignInPage = () => {
   return (

@@ -1,4 +1,4 @@
-import { type UserBoxReturned } from "~/server/api/routers/boxWebRouter";
+import { type UserBoxReturned } from "~web/server/api/routers/boxWebRouter";
 import Link from "next/link";
 import { Button } from "@noot/ui/src/components/Button";
 
@@ -24,9 +24,7 @@ const NoBoxesFound = (props: { userName: DashboardInnerProps["userName"] }) => {
         size="lg"
         asChild
       >
-        <Link href={"/create"}>
-          Create Box
-        </Link>
+        <Link href={"/create"}>Create Box</Link>
       </Button>
     </div>
   );

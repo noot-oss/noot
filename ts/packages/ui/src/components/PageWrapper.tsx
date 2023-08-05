@@ -1,15 +1,15 @@
 import { NavbarInner } from "../components/Navbar/Navbar";
 import { FooterInner } from "~ui/components/Footer";
-import { useSession } from "next-auth/react";
 import { cn } from "~ui/lib/utils";
+import { SessionContextValue } from "next-auth/react";
+
 export const mainStyles = "mx-4 my-8 grow lg:mx-16";
 
-type Session = ReturnType<typeof useSession>;
-
-const mockSession: Session = {
+const mockSession = {
   data: {
     expires: "2021-10-10T20:00:00.000Z",
     user: {
+      id: "1",
       email: "",
       name: "userName",
       image: "https://avatars.githubusercontent.com/u/9919?s=200&v=4",
@@ -19,7 +19,13 @@ const mockSession: Session = {
   update: async () => {
     return null;
   },
-};
+} satisfies SessionContextValue & {
+  data: {
+    user: {
+      id: string;
+    }
+  }
+}
 
 export const PageWrapper = ({
   children,

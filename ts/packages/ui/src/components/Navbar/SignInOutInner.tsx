@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import { Button } from "~ui/components/Button";
-import { useSession } from "next-auth/react";
+import { SessionContextValue } from "next-auth/react";
 
-export const SignInOutInner = (props: {
-  session: ReturnType<typeof useSession>;
-}) => {
+export const SignInOutInner = (props: { session: SessionContextValue }) => {
   return (
     <>
-      {props.session.data ? (
+      {props.session?.data ? (
         <Button color="primary" variant={"secondary"} asChild>
           <Link href="/api/auth/signout">Sign Out</Link>
         </Button>
