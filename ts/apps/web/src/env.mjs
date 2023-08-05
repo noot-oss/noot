@@ -29,6 +29,7 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+    NEXT_PUBLIC_GITHUB_SHA: process.env.NODE_ENV === "production" ? z.string().min(1) : z.string().max(0).optional(),
   },
 
   /**
