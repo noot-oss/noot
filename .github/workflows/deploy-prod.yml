@@ -52,9 +52,11 @@ jobs:
       run: pnpm install
       working-directory: "ts/apps/web"
 
-    - name: Expose github short sha
-      id: sha
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+    - name: Set outputs
+      id: vars
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+    - name: Check outputs
+      run: echo ${{ steps.vars.outputs.sha_short }}
       
 
     - name: Deploy
@@ -68,4 +70,4 @@ jobs:
         DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
         UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
         UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-        NEXT_PUBLIC_GITHUB_SHA: ${{ steps.sha.outputs.sha_short }}
+        NEXT_PUBLIC_GITHUB_SHA: ${{ steps.vars.outputs.sha_short }}
