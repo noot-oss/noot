@@ -63,7 +63,7 @@ model VerificationToken {
 
 // box
 model Box {
-  id        String   @id @unique @default(cuid())
+  id        String
   name      String
   ownerId   String
   token     String   @unique

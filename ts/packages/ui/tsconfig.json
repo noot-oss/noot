@@ -22,6 +22,7 @@
     "paths": {
       "~lib/*": ["lib/*"],
       "@components/*": ["components/*"],
+      "@types/*": ["types/*"],
     },
     "baseUrl": "./src"
   },
