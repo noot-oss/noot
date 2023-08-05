@@ -1,13 +1,12 @@
 "use client";
+
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 import { Providers } from "~/app/providers";
-import { useTheme } from "next-themes";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
-  const { theme } = useTheme();
   return (
-    <html lang="en" className={`h-full ${theme ?? "dark"}`}>
+    <html lang="en" suppressHydrationWarning>
       <body className="h-full">
         <Providers>{children}</Providers>
       </body>

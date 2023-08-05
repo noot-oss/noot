@@ -1,71 +1,44 @@
 "use client";
 
-import {
-  NavbarBrand,
-  NavbarContent,
-  Navbar as NavbarNextUI,
-  NavbarItem,
-  Switch,
-  Button,
-} from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Button } from "@noot/ui/src/components/Button";
 
-export const Navbar = () => {
-  const [mounted, setMounted] = useState(false);
-  const { setTheme, theme } = useTheme();
+const SignInOut = () => {
   const session = useSession();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  return (
+    <>
+      {session.data ? (
+        <Button color="primary" variant={"secondary"} asChild>
+          <Link href="/api/auth/signout">Sign Out</Link>
+        </Button>
+      ) : (
+        <Button color="primary" asChild variant={"secondary"}>
+          <Link href="/auth/signin">Sign In</Link>
+        </Button>
+      )}
+    </>
+  );
+};
 
-  if (!mounted) {
-    return <div style={{ height: "4rem", width: "100%" }}></div>;
-  }
+export const Navbar = () => {
+  const { setTheme, theme } = useTheme();
 
   return (
-    <NavbarNextUI isBordered>
-      <Link href="/">
-        <NavbarBrand>
-          {/*<AcmeLogo />*/}
-          <p className="font-bold text-inherit">Noot</p>
-        </NavbarBrand>
+    <nav className="w-full flex-row items-center border-b-2 border-b-white bg-background px-16 py-4">
+      <Link href={"/"} className={"text-2xl font-bold text-inherit"}>
+        Noot
       </Link>
-
-      <NavbarContent justify="end">
-        <NavbarItem>
-          {session.data ? (
-            <Button
-              as={Link}
-              color="primary"
-              href="/api/auth/signout"
-              variant="flat"
-            >
-              Sign Out
-            </Button>
-          ) : (
-            <Button
-              as={Link}
-              color="primary"
-              href="/auth/signin"
-              variant="flat"
-            >
-              Sign In
-            </Button>
-          )}
-        </NavbarItem>
-        <NavbarItem>
-          <Switch
-            className="mx-8"
-            defaultSelected={theme === "dark" ?? false}
-            onValueChange={(e: boolean) => setTheme(e ? "dark" : "light")}
-            aria-label={"Toggle theme"}
-          />
-        </NavbarItem>
-      </NavbarContent>
-    </NavbarNextUI>
+      <Button
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        aria-label={"Toggle theme"}
+        className="mx-8"
+      >
+        Switch Theme
+      </Button>
+      <SignInOut />
+    </nav>
   );
 };

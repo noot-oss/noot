@@ -1,6 +1,6 @@
 import { type UserBoxReturned } from "~/server/api/routers/boxWebRouter";
 import Link from "next/link";
-import { Button } from "@nextui-org/react";
+import { Button } from "@noot/ui/src/components/Button";
 
 interface DashboardInnerProps {
   userBoxes: UserBoxReturned[];
@@ -19,13 +19,14 @@ const NoBoxesFound = (props: { userName: DashboardInnerProps["userName"] }) => {
       </h2>
       <Button
         className={"mx-auto w-fit"}
-        variant="shadow"
+        variant={"default"}
         color="primary"
         size="lg"
-        as={Link}
-        href="/create"
+        asChild
       >
-        Create Box
+        <Link href={"/create"}>
+          Create Box
+        </Link>
       </Button>
     </div>
   );
