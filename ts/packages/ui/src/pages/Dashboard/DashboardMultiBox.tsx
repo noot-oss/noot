@@ -1,13 +1,13 @@
-import { Box } from "~lib/Box.ts";
-import { H1 } from "@components/Typography.tsx";
+import { Box } from "~ui/lib/Box";
+import { H1 } from "~ui/components/Typography";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@components/Card.tsx";
-import { Button } from "@components/Button.tsx";
+} from "~ui/components/Card";
+import { Button } from "~ui/components/Button";
 
 const DashboardBox = ({ box }: { box: Box }) => {
   return (

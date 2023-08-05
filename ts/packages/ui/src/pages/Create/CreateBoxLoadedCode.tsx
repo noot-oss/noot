@@ -23,7 +23,7 @@ export const CreateBoxLoadedCode = (props: { verificationCode: string }) => {
   return (
     <code
       className={
-        "flex w-1/2 flex-row items-center justify-between rounded-md bg-secondary/50 px-4 py-2 lg:w-full"
+        "flex w-full w-full flex-row items-center justify-between rounded-md bg-secondary/50 px-4 py-2"
       }
     >
       <span>{codeToDisplay}</span>
