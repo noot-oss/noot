@@ -1,98 +1,125 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"   // For creating the enrollment web server
 	log "github.com/sirupsen/logrus" // For logging
-	"os"
+	"io"
+	"net/http"
 )
 
 func main() {
 	// initiate the logging library
-	// set it so the logger only outputs to stdout instead of the default stderr
-	log.SetOutput(os.Stdout)
 	log.SetLevel(log.InfoLevel)
 	log.Info("Logging initiated!")
 
-	/*// This chunk of code goes to the url below and requests the message to print when the nootBOX starts up
+	// Is this code running in production or development mode?
+	prod := false
+	version := "V0.0.1"
 
-		resp, err := http.Get("https://msgsrvnoot.fluffywolff.repl.co/box/startupmessage/ml")
+	if prod {
+		log.Infof("This is NootBOX, PROD_%s.", version)
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		log.Warning("WARNING: THIS CODE IS RUNNING IN DEVELOPMENT MODE!!!")
+		log.Infof("This is NootBOX, DEV_%s.", version)
+	}
 
-		// if there is an error connecting to get the startup message, then say there's an error and use the one built in
-		if err != nil {
-			// error log goes here or smth
-		}
+	// TODO: fix the annoying thing where gin says "you trusted all proxies meeeeeeeehhhhhhhhhhhhhh". make it only trust all in dev.
 
-		// This closes the connection once it completes.
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				log.Error("Failed to get startup message. REASON: Couldn't defer 'Body'. ERROR: %s", err)
-			}
-		}(resp.Body)
 
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("Error:", err)
-			return
-		}
-
-		// if the response gave a status code of 200 (OK), then print what it gave us, otherwise? print the default message
-		if resp.StatusCode == 200 {
-			// print body of http GET request
-			fmt.Println(string(body))
-		} else {
-			// if code was not 200 (OK), then use the default welcome banner thingy
-			log.Error("Failed to get startup message. REASON: Status code was not '200'.")
-			log.Info("Falling back to default startup message.")
-	*/
-
-	// Print this cool thing.
-	fmt.Printf(`
- ███╗   ██╗ ██████╗  ██████╗ ████████╗██████╗  ██████╗ ██╗  ██╗
- ████╗  ██║██╔═══██╗██╔═══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚██╗██╔╝
- ██╔██╗ ██║██║   ██║██║   ██║   ██║   ██████╔╝██║   ██║ ╚███╔╝ 
- ██║╚██╗██║██║   ██║██║   ██║   ██║   ██╔══██╗██║   ██║ ██╔██╗ 
- ██║ ╚████║╚██████╔╝╚██████╔╝   ██║   ██████╔╝╚██████╔╝██╔╝ ██╗
- ╚═╝  ╚═══╝ ╚═════╝  ╚═════╝    ╚═╝   ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+	// Print the text logo
+	fmt.Printf(`|==================Your NootBOX is starting up!==================|
+| ███╗   ██╗ ██████╗  ██████╗ ████████╗██████╗  ██████╗ ██╗  ██╗ |
+| ████╗  ██║██╔═══██╗██╔═══██╗╚══██╔══╝██╔══██╗██╔═══██╗╚██╗██╔╝ |
+| ██╔██╗ ██║██║   ██║██║   ██║   ██║   ██████╔╝██║   ██║ ╚███╔╝  |
+| ██║╚██╗██║██║   ██║██║   ██║   ██║   ██╔══██╗██║   ██║ ██╔██╗  |
+| ██║ ╚████║╚██████╔╝╚██████╔╝   ██║   ██████╔╝╚██████╔╝██╔╝ ██╗ |
+| ╚═╝  ╚═══╝ ╚═════╝  ╚═════╝    ╚═╝   ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ |
+|==================Your NootBOX is starting up!==================|
 `)
 
 
-	// Check if we have a BoxID stored.
-	// TODO: Pull from storage location here
 
+	// Check if we have a BoxID stored.
+	// TODO: Pull BoxID from storage location here
 	// For now, lets use the example of us not having a box id.
 	var BoxID = 0 // if a boxID doesn't exist, set it to 0.
-	fmt.Printf("Your BoxID is %", BoxID) // TODO: fix the string format here.
+	if BoxID == 0 { // if the boxID doesn't exist:
+		log.Info("BoxID is equal to 0.")
+		log.Info("This NootBOX does not seem to be enrolled... Starting the enrollment webserver!")
+		// start enrollment server.
+		ginEnrollmentServer()
+	} else {
+		// TODO: Here, you want to see if the box ID is valid, if so, attempt to login and broadcast data.
+	}
+
 	// No box id? Start enroll procedure with a small gin webserver that says your temporary code
 
 	// Yes, there is a box id? Continue
 	// Try to login
 	// login failed? Start enroll procedure with gin webserver
 
+
 }
 
 
-// TODO: Explain this function w/ comments
+// This function is used when you want to create a webserver for the user to enroll their box onto.
 func ginEnrollmentServer() {
 	// Create a variable so we can control and add stuff to the gin server.
 	gws := gin.Default()
 
 	// Webserver URL routes go here
-	// TODO: Make "/" path return a HTML file
+	// TODO: Make this return a HTML file
 	gws.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Привет!, Это Gin Webserver на ГоЛанг!!",
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"message": "Hello!, this is the webserver for NootBOX.",
+		})
+	})
+
+	// TODO: edit this example to make it actually work.
+	gws.POST("/api/enrollwithcode/", func(c *gin.Context) {
+		// this variable temporarily stores the code the user has sent through the GWS.
+		var code int
+
+		// write the given code to the "code" variable.
+		if err := c.BindJSON(&code); err != nil {
+			log.Error("Failed to write user-given code to variable. REASON: Unknown. ERROR: %s", err)
+			return
+		}
+
+		// send a post request to NootWEB, to register this box.
+		postURL := "https://noot.site/api/box/enrollwithcode"
+		var jsonStr = []byte(`{"boxcode": `+string(rune(code))+`}`) // create a var to hold the JSON
+		req, err := http.NewRequest("POST", postURL, bytes.NewBuffer(jsonStr)) // create the request here.
+		req.Header.Set("Content-Type", "application/json") // tell the server we are sending JSON
+
+		client := &http.Client{} // initiate http client
+		resp, err := client.Do(req) // do the request we build earlier in the function
+		if err != nil {
+			log.Error("Failed to send box code to NootWEB. REASON: Couldn't initiate http.Client. ERROR: %s", err)
+			return
+		}
+
+		defer func(Body io.ReadCloser) { // close our connection once data is sent.
+			err := Body.Close()
+			if err != nil {
+				log.Error("Failed to send box code to NootWEB. REASON: Couldn't defer 'Body'. ERROR: %s", err)
+			}
+		}(resp.Body)
+		// body, _ := io.ReadAll(resp.Body) // body of the communication with NootWEB
+
+		// say on the GWS that the box has been registered.
+		c.IndentedJSON(http.StatusCreated, gin.H{
+			"message": "This NootBOX has been registered as box id \"nb-ru-8302-2746\"!",
+			"yoursentcode": code,
 		})
 	})
 
 
-	// TODO: create an API route that enrolls a NootBox if the entered code on the "/" path is valid.
-
-
-
 	// run the webserver
-	err := gws.Run() // this runs gws on ip 0.0.0.0 and port 8080
+	err := gws.Run("0.0.0.0:3000") // this runs gws on ip 0.0.0.0 and port 3000
 	if err != nil {
 		log.Error("Failed to start the Gin enrollment webserver. REASON: Webserver startup failed.. ERROR: %s", err)
 		return
