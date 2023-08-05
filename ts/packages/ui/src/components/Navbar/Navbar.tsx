@@ -7,11 +7,8 @@ import { SignInOutInner } from "~ui/components/Navbar/SignInOutInner";
 export const NavbarInner = (props: {
   theme: string;
   setTheme: (theme: "dark" | "light") => void;
-  session?: SessionContextValue;
+  session: SessionContextValue;
 }) => {
-  const sessionHooked = useSession();
-  const session = props.session ? props.session : sessionHooked;
-
   return (
     <nav className="flex w-full flex-row items-center border-b-2 border-b-secondary/50 bg-background px-4 py-4 lg:px-16">
       <Link href={"/"} className={"mr-auto text-2xl font-bold text-inherit"}>
@@ -26,7 +23,7 @@ export const NavbarInner = (props: {
       >
         Switch Theme
       </Button>
-      <SignInOutInner session={session} />
+      <SignInOutInner session={props.session} />
     </nav>
   );
 };

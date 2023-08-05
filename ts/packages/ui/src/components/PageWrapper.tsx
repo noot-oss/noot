@@ -1,7 +1,7 @@
 import { NavbarInner } from "../components/Navbar/Navbar";
 import { FooterInner } from "~ui/components/Footer";
 import { cn } from "~ui/lib/utils";
-import { SessionContextValue } from "next-auth/react";
+import type { SessionContextValue } from "next-auth/react";
 
 export const mainStyles = "mx-4 my-8 grow lg:mx-16";
 

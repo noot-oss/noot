@@ -17,7 +17,9 @@ export const FooterInner = (
       <span>
         Currently running in {PRODUCTION ? "production" : "development"} mode
       </span>
-      {PRODUCTION && <span>Version: {props.NEXT_PUBLIC_GITHUB_SHA}</span>}
+      {PRODUCTION && (
+        <span>Version: {props.NEXT_PUBLIC_GITHUB_SHA.substring(0, 7)}</span>
+      )}
     </footer>
   );
 };

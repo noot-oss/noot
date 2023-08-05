@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@noot/ui/src/components/Button";
+import { Button } from "~ui/components/Button";
 import { useMemo, useRef, useState } from "react";
 
 export const CreateBoxLoadedCode = (props: { verificationCode: string }) => {
@@ -9,11 +9,11 @@ export const CreateBoxLoadedCode = (props: { verificationCode: string }) => {
     "-" +
     props.verificationCode.substring(4);
   const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const copyCode = useMemo(() => {
     return () => {
-      clearInterval(timeoutRef.current);
+      clearInterval(timeoutRef.current ?? undefined);
       navigator.clipboard.writeText(props.verificationCode);
       setCopied(true);
       timeoutRef.current = setTimeout(() => setCopied(false), 1000);
