@@ -20,7 +20,6 @@ export const env = createEnv({
     //   Upstash
     UPSTASH_REDIS_REST_URL: z.string().min(1),
     UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
-    GITHUB_SHA: process.env.NODE_ENV === "production" ? z.string().min(1) : z.string().max(0).optional(),
   },
 
   /**
@@ -45,7 +44,6 @@ export const env = createEnv({
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
-    GITHUB_SHA: process.env.GITHUB_SHA,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
