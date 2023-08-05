@@ -1,6 +1,6 @@
 "use client";
 
-import "~/styles/globals.css";
+import "~web/styles/globals.css";
 import { api } from "~web/utils/api";
 import { Providers } from "~web/app/providers";
 
