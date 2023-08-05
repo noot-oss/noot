@@ -1,7 +1,7 @@
-import { CreateBoxLoadedCode } from "~/components/create/CreateBoxLoadedCode";
-import { getServerAuthSession } from "~/server/auth";
+import { CreateBoxLoadedCode } from "~web/components/create/CreateBoxLoadedCode";
+import { getServerAuthSession } from "~web/server/auth";
 import crypto from "node:crypto";
-import { prisma } from "~/server/db";
+import { prisma } from "~web/server/db";
 
 const StepSection = (props: { children: React.ReactNode }) => (
   <section className="flex flex-col gap-4">{props.children}</section>

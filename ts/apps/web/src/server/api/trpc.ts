@@ -12,12 +12,12 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
+import { getServerAuthSession } from "~web/server/auth";
+import { prisma } from "~web/server/db";
 import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-import { env } from "~/env.mjs";
+import { env } from "~web/env.mjs";
 
 /**
  * 1. CONTEXT
