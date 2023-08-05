@@ -8,7 +8,7 @@ export const Footer = () => {
       <span>
         Currently running in {PRODUCTION ? "production" : "development"} mode
       </span>
-      {PRODUCTION && <span>Version: {env.GITHUB_SHA}</span>}
+      {PRODUCTION && <span>Version: {process.env.NEXT_PUBLIC_GITHUB_SHA}</span>}
     </footer>
   );
 };
