@@ -52,6 +52,10 @@ jobs:
       run: pnpm install
       working-directory: "ts/apps/web"
 
+    - name: Expose github short sha
+      id: sha_output
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
     - name: Deploy
       run: pnpm sst deploy --stage prod
       working-directory: "ts/apps/web"
@@ -63,3 +67,4 @@ jobs:
         DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
         UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
         UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        NEXT_PUBLIC_GITHUB_SHA: ${{ steps.vars.outputs.sha_short }}
