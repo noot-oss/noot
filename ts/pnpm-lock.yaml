@@ -79,7 +79,7 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5(@prisma/client@5.0.0)(next-auth@4.22.1)
       '@noot/tailwind-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/tailwind-config
       '@noot/ui':
         specifier: '*'
