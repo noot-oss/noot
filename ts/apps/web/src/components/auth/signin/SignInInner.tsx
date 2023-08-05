@@ -3,6 +3,7 @@
 import { getProviders, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Button } from "@noot/ui/src/components/Button";
 
 export interface SIgnInInnerProps {
   callbackUrl: string;
@@ -40,7 +41,7 @@ export const SignInInner = () => {
             size="lg"
             className="text-xl"
             color="primary"
-            onPress={() => void signIn(provider.id)}
+            onClick={() => void signIn(provider.id)}
           >
             {provider.name}
           </Button>

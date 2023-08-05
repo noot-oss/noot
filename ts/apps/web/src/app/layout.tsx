@@ -7,7 +7,7 @@ import { Providers } from "~/app/providers";
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="h-full">
+      <body className="flex h-full flex-col">
         <Providers>{children}</Providers>
       </body>
     </html>

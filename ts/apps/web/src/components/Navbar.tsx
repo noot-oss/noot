@@ -27,8 +27,8 @@ export const Navbar = () => {
   const { setTheme, theme } = useTheme();
 
   return (
-    <nav className="w-full flex-row items-center border-b-2 border-b-white bg-background px-16 py-4">
-      <Link href={"/"} className={"text-2xl font-bold text-inherit"}>
+    <nav className="flex w-full flex-row items-center border-b-2 border-b-secondary/50 bg-background px-16 py-4">
+      <Link href={"/"} className={"mr-auto text-2xl font-bold text-inherit"}>
         Noot
       </Link>
       <Button
