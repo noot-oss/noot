@@ -1,7 +1,7 @@
-import { NavbarInner } from "@components/Navbar/Navbar.tsx";
-import { FooterInner } from "@components/Footer.tsx";
+import { NavbarInner } from "../components/Navbar/Navbar";
+import { FooterInner } from "~ui/components/Footer";
 import { useSession } from "next-auth/react";
-import { cn } from "~lib/utils.ts";
+import { cn } from "~ui/lib/utils";
 export const mainStyles = "mx-4 my-8 grow lg:mx-16";
 
 type Session = ReturnType<typeof useSession>;

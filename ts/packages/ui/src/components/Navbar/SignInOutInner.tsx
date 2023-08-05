@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@components/Button.tsx";
+import { Button } from "~ui/components/Button";
 import { useSession } from "next-auth/react";
 
 export const SignInOutInner = (props: {

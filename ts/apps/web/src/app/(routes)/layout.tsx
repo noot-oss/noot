@@ -1,5 +1,5 @@
 "use client";
-import { LayoutWithNavAndFooter } from "~/components/layout/Layouts";
+import { LayoutWithNavAndFooter } from "~web/components/layout/Layouts";
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
   <LayoutWithNavAndFooter>{children}</LayoutWithNavAndFooter>

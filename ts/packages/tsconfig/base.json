@@ -16,7 +16,9 @@
     "skipLibCheck": true,
     "strict": true,
     "paths": {
-      "~web/*": ["./apps/web/src/*"]
+      "~web/*": ["./apps/web/src/*"],
+      "~ui/components/*": ["./packages/ui/src/components/*"],
+      "~ui/lib/*": ["./packages/ui/src/lib/*"]
     },
     "baseUrl": "../../"
   },
