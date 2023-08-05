@@ -1,6 +1,6 @@
-import { boxWebRouter } from "~/server/api/routers/boxWebRouter";
-import { createTRPCRouter } from "~/server/api/trpc";
-import { externalRouter } from "~/server/api/routers/externalRouter";
+import { boxWebRouter } from "~web/server/api/routers/boxWebRouter";
+import { createTRPCRouter } from "~web/server/api/trpc";
+import { externalRouter } from "~web/server/api/routers/externalRouter";
 
 /**
  * This is the primary router for your server.

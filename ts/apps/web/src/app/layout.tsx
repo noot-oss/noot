@@ -1,8 +1,8 @@
 "use client";
 
 import "~/styles/globals.css";
-import { api } from "~/utils/api";
-import { Providers } from "~/app/providers";
+import { api } from "~web/utils/api";
+import { Providers } from "~web/app/providers";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (

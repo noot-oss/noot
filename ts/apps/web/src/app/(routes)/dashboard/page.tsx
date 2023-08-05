@@ -1,7 +1,7 @@
 "use client";
 
-import { api } from "~/utils/api";
-import { DashboardInner } from "~/components/DashboardInner";
+import { api } from "~web/utils/api";
+import { DashboardInner } from "~web/components/DashboardInner";
 import { useSession } from "next-auth/react";
 
 const Dashboard = () => {
