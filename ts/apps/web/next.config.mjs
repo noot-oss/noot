@@ -18,6 +18,7 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  transpilePackages: ["@noot/ui"]
 };
 
 export default config;

@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "../../../../packages/tailwind-config/styles.css";
+
+html {
+    height: 100%;
+    width: 100%;
+}
 
 [data-overlay-container=true] {
     height: 100%;
