@@ -93,7 +93,7 @@ export const DashboardMetricsInnerPage = (props: MetricsProps) => {
     <div className="flex h-full flex-col">
       <H1 className="mb-8">{props.boxData.name}</H1>
 
-      <Grid numItems={4} className={"h-full gap-8"}>
+      <Grid numItemsSm={1} numItemsLg={4} className={"h-fit gap-8"}>
         <NumberMetricCard
           title={"Co2 levels"}
           value={props.currentData.co2.value}
@@ -117,7 +117,7 @@ export const DashboardMetricsInnerPage = (props: MetricsProps) => {
 
         <UptimeTracker data={props.uptimeTrackerData} />
 
-        <Col numColSpan={3}>
+        <Col numColSpan={1} numColSpanLg={3}>
           <LineGraphAllData />
         </Col>
 
