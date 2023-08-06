@@ -11,17 +11,19 @@ const Dashboard = () => {
     refetchOnWindowFocus: false,
   });
 
-  const boxesToRender = userBoxes.data.map((box) => ({
-    id: box.id,
-    name: box.name,
-    description: "Box description",
-    added: box.createdAt,
-    updated: box.updatedAt,
-  }));
+  const boxesToRender = userBoxes.data
+    ? userBoxes.data.map((box) => ({
+        id: box.id,
+        name: box.name,
+        description: "Box description",
+        added: box.createdAt,
+        updated: box.updatedAt,
+      }))
+    : [];
 
   return (
     <div className={"h-full"}>
-      <DashboardInnerPage userBoxes={userBoxes.data ? boxesToRender : []} />
+      <DashboardInnerPage userBoxes={boxesToRender} />
     </div>
   );
 };
