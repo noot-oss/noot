@@ -7,7 +7,7 @@ import Link from "next/link";
 export const DashboardInnerPage = (props: { userBoxes: Box[] }) => {
   if (props.userBoxes.length === 0) {
     return (
-      <div className="flex flex-col gap-6 text-center">
+      <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
         <h1 className="text-5xl font-bold tracking-wider">
           We didn{"'"}t find any boxes for you.
         </h1>
