@@ -1,7 +1,10 @@
+"use client";
+
 import { NavbarInner } from "@noot/ui/src/components/Navbar/Navbar";
 import { FooterInner } from "@noot/ui/src/components/Footer";
 import { useTheme } from "next-themes";
 import { mainStyles } from "@noot/ui/src/components/PageWrapper";
+import { useSession } from "next-auth/react";
 
 export const LayoutWithNavAndFooter = (props: {
   children: React.ReactNode;
@@ -14,10 +17,11 @@ export const LayoutWithNavAndFooter = (props: {
         }
       : { NODE_ENV: "development" };
   const { theme, setTheme } = useTheme();
+  const session = useSession();
 
   return (
     <>
-      <NavbarInner theme={theme} setTheme={setTheme} />
+      <NavbarInner theme={theme} setTheme={setTheme} session={session} />
       <main className={mainStyles}>{props.children}</main>
       <FooterInner {...footerProps} />
     </>
