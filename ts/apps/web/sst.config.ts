@@ -1,5 +1,6 @@
 import { SSTConfig } from "sst";
 import { NextjsSite } from "sst/constructs";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
 export default {
   config(_input) {
@@ -11,7 +12,17 @@ export default {
   stacks(app) {
     app.stack(function Site({ stack }) {
       const site = new NextjsSite(stack, "site", {
-        customDomain: "noot.site",
+        customDomain: {
+          domainName: "noot.site",
+          isExternalDomain: true,
+          cdk: {
+            certificate: Certificate.fromCertificateArn(
+              stack,
+              "nootWebSiteCertificate",
+              process.env.WEB_SITE_AWS_ARN
+            ),
+          },
+        },
         environment: {
           DATABASE_URL: process.env.DATABASE_URL,
           NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
