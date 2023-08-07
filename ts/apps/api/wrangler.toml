@@ -1,2 +1,5 @@
-name = "my-app"
+name = "noot-api"
 compatibility_date = "2023-01-01"
+routes = [
+	{ pattern = "api.noot.site", custom_domain = true }
+]
