@@ -26,6 +26,15 @@ importers:
 
   apps/api:
     dependencies:
+      '@upstash/ratelimit':
+        specifier: ^0.4.3
+        version: 0.4.3
+      '@upstash/redis':
+        specifier: ^1.22.0
+        version: 1.22.0
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
       hono:
         specifier: ^3.3.4
         version: 3.3.4
@@ -6094,7 +6103,6 @@ packages:
   /dotenv@16.3.1:
     resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
     engines: {node: '>=12'}
-    dev: true
 
   /dset@3.1.2:
     resolution: {integrity: sha512-g/M9sqy3oHe477Ar4voQxWtaPIFw1jTdKZuomOjhCcBx9nHUNn0pu6NopuFFrTh/TRZIKEj+76vLWFu9BNKk+Q==}
