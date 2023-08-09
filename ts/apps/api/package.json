@@ -7,7 +7,8 @@
     "@upstash/ratelimit": "^0.4.3",
     "@upstash/redis": "^1.22.0",
     "dotenv": "^16.3.1",
-    "hono": "^3.3.4"
+    "hono": "^3.3.4",
+    "nanoid": "^4.0.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230628.0",
