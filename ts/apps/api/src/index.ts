@@ -27,17 +27,32 @@ app.use("*", async (context, next) => {
     prefix: "@upstash/ratelimit/api",
   });
 
-  // TODO: Rate limit by identifier/ip
-  const success = await ratelimit.limit("all");
+  const cfIp = context.req.headers.get("cf-connecting-ip");
+  const primaryIp = context.req.headers.get("x-real-ip");
+  const finalIp = context.req.headers.get("x-forwarded-for");
+  const ip = cfIp || primaryIp || finalIp;
 
-  console.log(success);
+  if (!ip) {
+    return context.json(
+      {
+        error: "No IP address",
+      },
+      400
+    );
+  }
 
-  return context.json(
-    {
-      error: "Too many requests",
-    },
-    429
-  );
+  const success = await ratelimit.limit(ip);
+
+  if (!success) {
+    return context.json(
+      {
+        error: "Too many requests",
+      },
+      429
+    );
+  }
+
+  return next();
 });
 
 app.get("/", (c) => c.text("Welcome to the Noot API!"));
