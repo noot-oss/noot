@@ -131,7 +131,25 @@ app.post(
     })
   ),
   async (c) => {
-    return c.text("HAIII!!!! HEWOOO!!!! nyaaaa uwu");
+    const redis = Redis.fromEnv({
+      UPSTASH_REDIS_REST_URL: c.env.UPSTASH_REDIS_REST_URL,
+      UPSTASH_REDIS_REST_TOKEN: c.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+
+    const { token } = c.req.valid("json");
+
+    const accountId = await redis.get(`noot:initToken:${token}`);
+
+    if (!accountId) {
+      return c.json(
+        {
+          error: "Invalid token",
+        },
+        400
+      );
+    }
+
+    const boxId = nanoid();
   }
 );
 // POST /push   - NootBOX sends data to this endpoint. - {co2: 123, temp: 25, hu: 75}
