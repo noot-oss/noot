@@ -1,3 +1,9 @@
 {
-  "name": "@noot/db"
+  "name": "@noot/db",
+  "scripts": {
+    "postinstall": "prisma generate"
+  },
+  "devDependencies": {
+    "prisma": "^5.0.0"
+  }
 }

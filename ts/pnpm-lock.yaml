@@ -103,6 +103,9 @@ importers:
       '@next-auth/prisma-adapter':
         specifier: ^1.0.5
         version: 1.0.5(@prisma/client@5.0.0)(next-auth@4.22.1)
+      '@noot/db':
+        specifier: '*'
+        version: link:../../packages/db
       '@noot/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/tailwind-config
@@ -111,7 +114,7 @@ importers:
         version: link:../../packages/ui
       '@prisma/client':
         specifier: ^5.0.0
-        version: 5.0.0(prisma@5.0.0)
+        version: 5.0.0
       '@t3-oss/env-nextjs':
         specifier: ^0.3.1
         version: 0.3.1(typescript@5.1.6)(zod@3.21.4)
@@ -212,15 +215,18 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.2.8
         version: 0.2.8(prettier@2.8.8)
-      prisma:
-        specifier: ^5.0.0
-        version: 5.0.0
       sst:
         specifier: ^2.22.9
         version: 2.22.9(@types/react@18.2.6)
       tailwindcss:
         specifier: ^3.3.0
         version: 3.3.0(postcss@8.4.21)
+
+  packages/db:
+    devDependencies:
+      prisma:
+        specifier: ^5.0.0
+        version: 5.0.0
 
   packages/eslint-config-custom:
     dependencies:
@@ -2866,7 +2872,7 @@ packages:
       '@prisma/client': '>=2.26.0 || >=3'
       next-auth: ^4
     dependencies:
-      '@prisma/client': 5.0.0(prisma@5.0.0)
+      '@prisma/client': 5.0.0
       next-auth: 4.22.1(next@13.4.10)(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
@@ -3015,7 +3021,7 @@ packages:
       picocolors: 1.0.0
       tslib: 2.6.0
 
-  /@prisma/client@5.0.0(prisma@5.0.0):
+  /@prisma/client@5.0.0:
     resolution: {integrity: sha512-XlO5ELNAQ7rV4cXIDJUNBEgdLwX3pjtt9Q/RHqDpGf43szpNJx2hJnggfFs7TKNx0cOFsl6KJCSfqr5duEU/bQ==}
     engines: {node: '>=16.13'}
     requiresBuild: true
@@ -3026,7 +3032,6 @@ packages:
         optional: true
     dependencies:
       '@prisma/engines-version': 4.17.0-26.6b0aef69b7cdfc787f822ecd7cdc76d5f1991584
-      prisma: 5.0.0
     dev: false
 
   /@prisma/engines-version@4.17.0-26.6b0aef69b7cdfc787f822ecd7cdc76d5f1991584:
@@ -3036,6 +3041,7 @@ packages:
   /@prisma/engines@5.0.0:
     resolution: {integrity: sha512-kyT/8fd0OpWmhAU5YnY7eP31brW1q1YrTGoblWrhQJDiN/1K+Z8S1kylcmtjqx5wsUGcP1HBWutayA/jtyt+sg==}
     requiresBuild: true
+    dev: true
 
   /@radix-ui/react-compose-refs@1.0.1(@types/react@18.2.15)(react@18.2.0):
     resolution: {integrity: sha512-fDSBgd44FKHa1FRMU59qBMPFcl2PZE+2nmqunj+BWFyYYjnhIDWL2ItDs3rrbJDQOtzt5nIebLCQc4QRfz6LJw==}
@@ -10476,6 +10482,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@prisma/engines': 5.0.0
+    dev: true
 
   /process-nextick-args@1.0.7:
     resolution: {integrity: sha512-yN0WQmuCX63LP/TMvAg31nvT6m4vDqJEiiv2CAZqWOGNWutc9DfDk1NPYYmKUFmaVM2UwDowH4u5AHWYP/jxKw==}
