@@ -1,11 +1,12 @@
 import { getServerAuthSession } from "~web/server/auth";
 import crypto from "node:crypto";
 import { CreatePageInner } from "@noot/ui/src/pages/Create/CreatePage";
+import { db } from "@noot/db";
 
 const CreatePage = async () => {
   const session = await getServerAuthSession();
 
-  const userBoxInit = await ctx.boxInit.findFirst({
+  const userBoxInit = await db.boxInit.findFirst({
     where: {
       creatorId: session.user.id,
     },
