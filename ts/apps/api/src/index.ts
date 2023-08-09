@@ -41,7 +41,7 @@ app.use("*", async (context, next) => {
     );
   }
 
-  const success = await ratelimit.limit(ip);
+  const { success } = await ratelimit.limit(ip);
 
   if (!success) {
     return context.json(
