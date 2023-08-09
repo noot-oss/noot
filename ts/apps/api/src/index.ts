@@ -22,6 +22,8 @@ app.use("*", async (context, next) => {
   // TODO: Rate limit by identifier/ip
   const success = await ratelimit.limit("all");
 
+  console.log(success);
+
   return context.json(
     {
       error: "Too many requests",
