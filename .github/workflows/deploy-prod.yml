@@ -49,7 +49,7 @@ jobs:
           ${{ runner.os }}-pnpm-store-
 
     - name: Install deps
-      run: pnpm install --filter=web
+      run: pnpm install
       working-directory: "ts/apps/web"
 
     - name: Deploy
@@ -101,7 +101,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install deps
-        run: pnpm install --filter=api
+        run: pnpm install
         working-directory: "ts/apps/api"
 
       - name: Deploy

@@ -1,8 +1,8 @@
 {
+  "name": "api",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts",
-    "postinstall": "prisma generate --data-proxy --schema=../../packages/db/schema.prisma"
+    "deploy": "prisma generate --data-proxy --schema=../../packages/db/schema.prisma && wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
     "@upstash/ratelimit": "^0.4.3",
