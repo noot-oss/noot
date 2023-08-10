@@ -4,6 +4,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import { db } from "@noot/db";
 
 type EnvVars = {
   UPSTASH_REDIS_REST_URL: string;
@@ -68,9 +69,7 @@ app.use("*", async (context, next) => {
 app.get("/", (c) => c.text("Welcome to the Noot API!"));
 
 // POST /verify - Takes a code, and outputs a token for /init.
-// Returns {
-//     "token": "xMR0j_QFsuo8CgpT281eX"
-// }
+// Returns box data
 app.post(
   "/verify",
   zValidator(
@@ -80,15 +79,15 @@ app.post(
     })
   ),
   async (c) => {
-    const redis = Redis.fromEnv({
-      UPSTASH_REDIS_REST_URL: c.env.UPSTASH_REDIS_REST_URL,
-      UPSTASH_REDIS_REST_TOKEN: c.env.UPSTASH_REDIS_REST_TOKEN,
-    });
     const { code } = c.req.valid("json");
 
-    const accountId = await redis.get(`noot:verifyCode:${code}`);
+    const boxInitFound = await db.boxInit.findUnique({
+      where: {
+        verificationCode: code,
+      },
+    });
 
-    if (!accountId) {
+    if (!boxInitFound) {
       return c.json(
         {
           error: "Invalid code",
@@ -97,50 +96,72 @@ app.post(
       );
     }
 
-    const token = nanoid();
+    const boxId = nanoid();
+    const generatedToken = nanoid();
 
-    const generatedToken = await redis.set(
-      `noot:initToken:${token}`,
-      accountId
-    );
+    const box = db.box.create({
+      data: {
+        id: boxId,
+        ownerId: boxInitFound.creatorId,
+        token: generatedToken,
+        name: `NootBOX-${boxId.substring(0, 4)}`,
+      },
+    });
 
-    if (generatedToken !== "OK") {
+    const fetchedBox = await db.box.findUnique({
+      where: {
+        id: boxId,
+        token: generatedToken,
+      },
+    });
+
+    if (!fetchedBox) {
       return c.json(
         {
-          error: "Failed to generate token",
+          error: "Failed to generate box",
         },
         500
       );
     }
 
-    await redis.del(`noot:verifyCode:${code}`);
+    await db.boxInit.delete({
+      where: {
+        verificationCode: code,
+      },
+    });
 
     return c.json({
-      token,
+      box,
     });
   }
 );
-
-// POST /init   - Takes the token from /verify and enrolls the box onto NootWEB.
+// POST /push   - NootBOX sends data to this endpoint. - {co2: 123, temp: 25, humidity: 75, token: "BOX_TOKEN}
 app.post(
-  "/init",
+  "/push",
   zValidator(
     "json",
     z.object({
+      co2: z.number(),
+      temp: z.number(),
+      humidity: z.number(),
       token: z.string(),
     })
   ),
   async (c) => {
+    const { co2, temp, humidity, token } = c.req.valid("json");
+
     const redis = Redis.fromEnv({
       UPSTASH_REDIS_REST_URL: c.env.UPSTASH_REDIS_REST_URL,
       UPSTASH_REDIS_REST_TOKEN: c.env.UPSTASH_REDIS_REST_TOKEN,
     });
 
-    const { token } = c.req.valid("json");
+    const box = await db.box.findUnique({
+      where: {
+        token,
+      },
+    });
 
-    const accountId = await redis.get(`noot:initToken:${token}`);
-
-    if (!accountId) {
+    if (!box) {
       return c.json(
         {
           error: "Invalid token",
@@ -149,9 +170,38 @@ app.post(
       );
     }
 
-    const boxId = nanoid();
+    const logId = nanoid();
+
+    try {
+      const data = await db.dataLog.create({
+        data: {
+          id: logId,
+          boxId: box.id,
+          co2,
+          temp,
+          humidity,
+        },
+      });
+    } catch (e) {
+      return c.json(
+        {
+          error: "Failed to log data",
+        },
+        500
+      );
+    }
+
+    await redis.set(`nootbox:${box.id}:latest`, {
+      co2,
+      temp,
+      humidity,
+    });
+
+    return c.json({
+      success: true,
+      logId,
+    });
   }
 );
-// POST /push   - NootBOX sends data to this endpoint. - {co2: 123, temp: 25, hu: 75}
 
 export default app;

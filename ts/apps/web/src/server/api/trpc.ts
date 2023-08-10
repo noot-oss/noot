@@ -16,8 +16,8 @@ import { getServerAuthSession } from "~web/server/auth";
 import { prisma } from "~web/server/db";
 import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import { env } from "~web/env.mjs";
+import { redis } from "@noot/db";
 
 /**
  * 1. CONTEXT
@@ -150,7 +150,7 @@ const enforceBoxHasToken = t.middleware(async ({ ctx, next }) => {
 });
 
 const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
+  redis: redis,
   limiter: Ratelimit.slidingWindow(1, "55 s"),
   prefix: "@upstash/ratelimit",
   analytics: true,

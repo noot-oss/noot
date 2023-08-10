@@ -22,7 +22,6 @@
     "@trpc/react-query": "^10.26.0",
     "@trpc/server": "^10.26.0",
     "@upstash/ratelimit": "^0.4.3",
-    "@upstash/redis": "^1.22.0",
     "framer-motion": "^10.12.22",
     "next": "^13.4.10",
     "next-auth": "^4.22.1",

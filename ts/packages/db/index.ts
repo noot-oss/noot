@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client/edge";
+import { Redis } from "@upstash/redis";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -16,3 +17,4 @@ export const prisma =
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export const db = prisma;
+export const redis = Redis.fromEnv();

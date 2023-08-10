@@ -139,9 +139,6 @@ importers:
       '@upstash/ratelimit':
         specifier: ^0.4.3
         version: 0.4.3
-      '@upstash/redis':
-        specifier: ^1.22.0
-        version: 1.22.0
       framer-motion:
         specifier: ^10.12.22
         version: 10.12.22(react-dom@18.2.0)(react@18.2.0)
@@ -227,6 +224,9 @@ importers:
       '@prisma/client':
         specifier: ^5.1.1
         version: 5.1.1(prisma@5.0.0)
+      '@upstash/redis':
+        specifier: ^1.22.0
+        version: 1.22.0
     devDependencies:
       prisma:
         specifier: ^5.0.0
