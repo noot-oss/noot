@@ -7,12 +7,23 @@ import { DashboardInnerPage } from "@noot/ui/src/pages/Dashboard/DashboardInnerP
 const Dashboard = () => {
   const user = useSession();
 
-  const userBoxes = api.box.getUserBoxes.useQuery(undefined, {
+  const {
+    refetch: refetchUserBoxes,
+    data: userBoxesData,
+    isFetching: isFetchingUserBoxes,
+    isError: userBoxIsError,
+    error: userBoxError,
+    failureReason: userBoxFailureReason,
+  } = api.box.getUserBoxes.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
 
-  const boxesToRender = userBoxes.data
-    ? userBoxes.data.map((box) => ({
+  const userCode = api.box.fetchCode.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  const boxesToRender = userBoxesData
+    ? userBoxesData.map((box) => ({
         id: box.id,
         name: box.name,
         description: "Box description",
@@ -21,9 +32,21 @@ const Dashboard = () => {
       }))
     : [];
 
+  const refetchData = () => {
+    refetchUserBoxes();
+  };
+
+  console.log(userBoxError.message);
+
   return (
     <div className={"h-full"}>
-      <DashboardInnerPage userBoxes={boxesToRender} />
+      <DashboardInnerPage
+        userBoxes={boxesToRender}
+        code={userCode.data.verificationCode}
+        refetch={refetchData}
+        isFetching={isFetchingUserBoxes}
+        fetchedMessage={""}
+      />
     </div>
   );
 };

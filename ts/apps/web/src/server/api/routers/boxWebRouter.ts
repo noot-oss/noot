@@ -17,11 +17,23 @@ export const boxWebRouter = createTRPCRouter({
       updatedAt: box.updatedAt,
     })) satisfies UserBoxReturned[];
   }),
-  createBoxCode: protectedProcedure.query(async ({ ctx }) => {
+  fetchCode: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.ip) {
       throw new TRPCError({
         code: "BAD_REQUEST",
       });
+    }
+
+    const existingCode = await ctx.prisma.boxInit.findFirst({
+      where: {
+        creatorId: ctx.session.user.id,
+      },
+    });
+
+    if (existingCode && existingCode.verificationCode) {
+      return {
+        verificationCode: existingCode.verificationCode,
+      };
     }
 
     const EightDigitCode = crypto.randomInt(10000000, 99999999);
