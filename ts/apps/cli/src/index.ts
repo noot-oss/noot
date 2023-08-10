@@ -9,8 +9,14 @@ import * as process from "process";
 
 displayTitle();
 
-const data = await axios.get("http://localhost:3000").catch((err) => {
-  throw new Error("Server is not running at localhost:3000");
+// API Server
+await axios.get("http://127.0.0.1:8787").catch((err) => {
+  throw new Error("Server is not running at 127.0.0.1:8787");
+});
+
+// Next.js Server
+await axios.get("http://localhost:3000").catch((err) => {
+  throw new Error("Server is not running at http://localhost:3000");
 });
 
 initOptions();
