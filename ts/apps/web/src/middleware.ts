@@ -7,5 +7,5 @@ export default withAuth(function middleware(req) {}, {
 });
 
 export const config = {
-  matcher: ["/dashboard/*"],
+  matcher: ["/dashboard/:id*"],
 };
