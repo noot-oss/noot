@@ -33,6 +33,7 @@ const Dashboard = () => {
     : [];
 
   const refetchData = () => {
+    setHasRefetched(true);
     refetchUserBoxes();
   };
 
