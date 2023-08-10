@@ -1,9 +1,13 @@
-import { createTRPCRouter, protectedProcedure } from "~web/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  rateLimitedProtectedProcedure,
+} from "~web/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import crypto from "node:crypto";
 
 export const boxWebRouter = createTRPCRouter({
-  getUserBoxes: protectedProcedure.query(async ({ ctx }) => {
+  getUserBoxes: rateLimitedProtectedProcedure.query(async ({ ctx }) => {
     const userBoxes = await ctx.prisma.box.findMany({
       where: {
         ownerId: ctx.session.user.id,

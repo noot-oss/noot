@@ -151,7 +151,7 @@ const enforceBoxHasToken = t.middleware(async ({ ctx, next }) => {
 
 const ratelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.slidingWindow(1, "55 s"),
+  limiter: Ratelimit.slidingWindow(10, "10 s"),
   prefix: "@upstash/ratelimit",
   analytics: true,
 });
