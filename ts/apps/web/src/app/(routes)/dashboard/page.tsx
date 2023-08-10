@@ -3,17 +3,17 @@
 import { api } from "~web/utils/api";
 import { useSession } from "next-auth/react";
 import { DashboardInnerPage } from "@noot/ui/src/pages/Dashboard/DashboardInnerPage";
+import { useState } from "react";
 
 const Dashboard = () => {
   const user = useSession();
+  const [hasRefetched, setHasRefetched] = useState(false);
 
   const {
     refetch: refetchUserBoxes,
     data: userBoxesData,
     isFetching: isFetchingUserBoxes,
-    isError: userBoxIsError,
-    error: userBoxError,
-    failureReason: userBoxFailureReason,
+    isError: isErrorUserBoxes,
   } = api.box.getUserBoxes.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
@@ -36,16 +36,20 @@ const Dashboard = () => {
     refetchUserBoxes();
   };
 
-  console.log(userBoxError, userBoxIsError, userBoxFailureReason);
+  const errorToDisplay = hasRefetched
+    ? isErrorUserBoxes
+      ? "too-many-requests"
+      : "not-found"
+    : undefined;
 
   return (
     <div className={"h-full"}>
       <DashboardInnerPage
         userBoxes={boxesToRender}
-        code={userCode.data.verificationCode}
+        code={userCode.data ? userCode.data.verificationCode : undefined}
         refetch={refetchData}
         isFetching={isFetchingUserBoxes}
-        fetchedMessage={""}
+        fetchedMessage={errorToDisplay}
       />
     </div>
   );
