@@ -1,7 +1,7 @@
 {
   "name": "@noot/db",
   "scripts": {
-    "postinstall": "prisma generate --data-proxy"
+    "postinstall": "prisma generate"
   },
   "devDependencies": {
     "prisma": "^5.0.0"
