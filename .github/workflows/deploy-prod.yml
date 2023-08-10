@@ -101,7 +101,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install deps
-        run: pnpm install
+        run: pnpm install --filter=api
         working-directory: "ts/apps/api"
 
       - name: Deploy
