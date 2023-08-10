@@ -36,7 +36,7 @@ const Dashboard = () => {
     refetchUserBoxes();
   };
 
-  console.log(userBoxError.message);
+  console.log(userBoxError, userBoxIsError, userBoxFailureReason);
 
   return (
     <div className={"h-full"}>
