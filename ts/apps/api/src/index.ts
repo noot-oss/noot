@@ -4,7 +4,8 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import { db } from "@noot/db";
+import { PrismaClient } from "@prisma/client/edge";
+const db = new PrismaClient();
 
 type EnvVars = {
   UPSTASH_REDIS_REST_URL: string;

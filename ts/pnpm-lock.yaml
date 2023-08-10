@@ -26,9 +26,6 @@ importers:
 
   apps/api:
     dependencies:
-      '@noot/db':
-        specifier: '*'
-        version: link:../../packages/db
       '@upstash/ratelimit':
         specifier: ^0.4.3
         version: 0.4.3
@@ -44,6 +41,9 @@ importers:
       nanoid:
         specifier: ^4.0.2
         version: 4.0.2
+      prisma:
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20230628.0
