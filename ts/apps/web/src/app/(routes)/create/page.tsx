@@ -12,7 +12,7 @@ const CreatePage = async () => {
     },
   });
 
-  if (userBoxInit.verificationCode) {
+  if (userBoxInit && userBoxInit.verificationCode) {
     return <CreatePageInner code={userBoxInit.verificationCode} />;
   }
 
