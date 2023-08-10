@@ -1,12 +1,16 @@
 import { getServerAuthSession } from "~web/server/auth";
 import crypto from "node:crypto";
 import { CreatePageInner } from "@noot/ui/src/pages/Create/CreatePage";
-import { redis } from "@noot/db";
+import { db } from "@noot/db";
 
 const CreatePage = async () => {
   const session = await getServerAuthSession();
 
-  const userCode = await redis.get(`user:${session.user.id}:boxInit`);
+  const userBoxInit = await db.boxInit.findFirst({
+    where: {
+      creatorId: session.user.id,
+    },
+  });
 
   if (userBoxInit.verificationCode) {
     return <CreatePageInner code={userBoxInit.verificationCode} />;

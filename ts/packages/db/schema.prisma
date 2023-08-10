@@ -75,7 +75,7 @@ model Box {
 model BoxInit {
   verificationCode String   @unique
   boxId            String   @id @default(cuid())
-  createdAt        DateTime @default(now())
+  createdAt        DateTime @unique @default(now())
   creatorId        String
 }
 
