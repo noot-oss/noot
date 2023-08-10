@@ -5,11 +5,11 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { PrismaClient } from "@prisma/client/edge";
-const db = new PrismaClient();
 
 type EnvVars = {
   UPSTASH_REDIS_REST_URL: string;
   UPSTASH_REDIS_REST_TOKEN: string;
+  DATABASE_URL: string;
   IS_DEV?: string;
 };
 
@@ -81,6 +81,13 @@ app.post(
   ),
   async (c) => {
     const { code } = c.req.valid("json");
+    const db = new PrismaClient({
+      datasources: {
+        db: {
+          url: c.env.DATABASE_URL,
+        },
+      },
+    });
 
     const boxInitFound = await db.boxInit.findUnique({
       where: {
@@ -154,6 +161,14 @@ app.post(
     const redis = Redis.fromEnv({
       UPSTASH_REDIS_REST_URL: c.env.UPSTASH_REDIS_REST_URL,
       UPSTASH_REDIS_REST_TOKEN: c.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+
+    const db = new PrismaClient({
+      datasources: {
+        db: {
+          url: c.env.DATABASE_URL,
+        },
+      },
     });
 
     const box = await db.box.findUnique({
