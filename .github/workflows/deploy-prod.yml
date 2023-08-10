@@ -1,4 +1,4 @@
-name: "Deploy to AWS via SST"
+name: "Deploy Website and API"
 on:
   push:
     branches:
@@ -49,7 +49,7 @@ jobs:
           ${{ runner.os }}-pnpm-store-
 
     - name: Install deps
-      run: pnpm install
+      run: pnpm install --filter=web
       working-directory: "ts/apps/web"
 
     - name: Deploy
