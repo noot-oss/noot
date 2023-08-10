@@ -9,11 +9,11 @@
     "@upstash/redis": "^1.22.0",
     "dotenv": "^16.3.1",
     "hono": "^3.3.4",
-    "nanoid": "^4.0.2",
-    "prisma": "^5.0.0"
+    "nanoid": "^4.0.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230628.0",
+    "prisma": "^5.1.1",
     "wrangler": "^3.1.2"
   }
 }
