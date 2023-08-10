@@ -61,7 +61,10 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
 export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
   const req = opts.req;
   const boxToken = opts?.req.headers.get("box-token");
-  const ip = req.headers.get("x-forwarded-for");
+
+  const isLocal = env.NODE_ENV === "development";
+
+  const ip = isLocal ? "localhost" : req.headers.get("x-forwarded-for");
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession();

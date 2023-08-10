@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "~ui/components/Card";
 import { Button } from "~ui/components/Button";
+import Link from "next/link";
 
 const DashboardBox = ({ box }: { box: Box }) => {
   return (
@@ -19,7 +20,9 @@ const DashboardBox = ({ box }: { box: Box }) => {
         <p>{box.description}</p>
       </CardContent>
       <CardFooter className="mt-auto">
-        <Button className="mt-auto w-full">Continue</Button>
+        <Button className="mt-auto w-full" asChild>
+          <Link href={`/dashboard/${box.id}`}>Continue</Link>
+        </Button>
       </CardFooter>
     </Card>
   );

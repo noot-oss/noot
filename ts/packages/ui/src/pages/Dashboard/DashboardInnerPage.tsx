@@ -5,6 +5,8 @@ import type { Box } from "~ui/lib/Box";
 import { DashboardMultiBox } from "./DashboardMultiBox";
 import { Button } from "~ui/components/Button";
 import { CreateBoxLoadedCode } from "../Create/CreateBoxLoadedCode";
+import { DashboardMetricsInnerPage } from "./Metrics/DashboardMetricsInnerPage";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const StepSection = (props: { children: React.ReactNode }) => (
   <section className="flex flex-col gap-4">{props.children}</section>
@@ -21,6 +23,21 @@ export const DashboardInnerPage = (props: {
   isFetching?: boolean;
   fetchedMessage?: "not-found" | "too-many-requests" | "";
 }) => {
+  const firstBoxName = props.userBoxes[0]?.name;
+
+  if (props.isFetching) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <PulseLoader
+          size={75}
+          color={"hsl(var(--foreground)/50%)"}
+          speedMultiplier={0.5}
+          aria-label={"Loading"}
+        />
+      </div>
+    );
+  }
+
   if (props.userBoxes.length === 0) {
     return (
       <div className="flex h-full flex-col items-center">
@@ -72,16 +89,31 @@ export const DashboardInnerPage = (props: {
   }
 
   if (props.userBoxes.length > 1) {
-    return (
-      <>
-        <DashboardMultiBox userBoxes={props.userBoxes} />
-      </>
-    );
+    return <DashboardMultiBox userBoxes={props.userBoxes} />;
   }
 
   return (
     <>
-      <H1>Dashboard with metrics</H1>
+      <DashboardMetricsInnerPage
+        uptimeTrackerData={[]}
+        currentData={{
+          co2: {
+            value: 400,
+            delta: "increase",
+          },
+          temperature: {
+            value: 20,
+            delta: "increase",
+          },
+          humidity: {
+            value: 50,
+            delta: "increase",
+          },
+        }}
+        boxData={{
+          name: firstBoxName ?? "Loading...",
+        }}
+      />
     </>
   );
 };

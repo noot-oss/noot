@@ -22,6 +22,7 @@ export const boxWebRouter = createTRPCRouter({
     })) satisfies UserBoxReturned[];
   }),
   fetchCode: protectedProcedure.query(async ({ ctx }) => {
+    console.log(ctx.ip, "ip");
     if (!ctx.ip) {
       throw new TRPCError({
         code: "BAD_REQUEST",
