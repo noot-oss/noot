@@ -7,6 +7,14 @@ import { Button } from "~ui/components/Button";
 import { CreateBoxLoadedCode } from "../Create/CreateBoxLoadedCode";
 import { DashboardMetricsInnerPage } from "./Metrics/DashboardMetricsInnerPage";
 import PulseLoader from "react-spinners/PulseLoader";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~ui/components/Card";
+import { Skeleton } from "~ui/components/Skeleton";
 
 const StepSection = (props: { children: React.ReactNode }) => (
   <section className="flex flex-col gap-4">{props.children}</section>
@@ -27,13 +35,20 @@ export const DashboardInnerPage = (props: {
 
   if (props.isFetching) {
     return (
-      <div className="flex h-full w-full items-center justify-center">
-        <PulseLoader
-          size={75}
-          color={"hsl(var(--foreground)/50%)"}
-          speedMultiplier={0.5}
-          aria-label={"Loading"}
-        />
+      <div className="flex flex-col gap-8">
+        <Skeleton className="h-16 w-full sm:w-[20rem]" />
+        <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 2 }).map((box, index) => (
+            <li key={`skeleton-${index}`}>
+              <Skeleton className="flex h-full flex-col p-6">
+                <Skeleton className="h-10 w-2/3" />
+                <Skeleton className="my-4 flex h-6 w-5/6" />
+
+                <Skeleton className="h-12 w-full" />
+              </Skeleton>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
