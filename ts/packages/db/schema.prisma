@@ -100,3 +100,9 @@ model BoxActionLog {
   action    String
   createdAt DateTime @default(now())
 }
+
+model AllowedAccount {
+  allowedProviderAccountId String   @unique
+  allowedAt                DateTime @default(now())
+  updatedAt                DateTime @default(now()) @updatedAt
+}

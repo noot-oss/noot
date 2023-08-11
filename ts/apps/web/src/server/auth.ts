@@ -42,6 +42,19 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    signIn: async ({ account }) => {
+      const foundAccount = await prisma.allowedAccount.findUnique({
+        where: {
+          allowedProviderAccountId: account.providerAccountId,
+        },
+      });
+
+      if (!foundAccount) {
+        return "/unauthorized";
+      }
+
+      return true;
+    },
   },
   adapter: PrismaAdapter(prisma),
   providers: [
