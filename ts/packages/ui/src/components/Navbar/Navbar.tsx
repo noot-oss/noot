@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, SessionContextValue } from "next-auth/react";
+import { SessionContextValue } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "~ui/components/Button";
 import { SignInOutInner } from "~ui/components/Navbar/SignInOutInner";
@@ -11,7 +11,10 @@ export const NavbarInner = (props: {
 }) => {
   return (
     <nav className="flex w-full flex-row items-center border-b-2 border-b-secondary/50 bg-background px-4 py-4 lg:px-16">
-      <Link href={"/"} className={"mr-auto text-2xl font-bold text-inherit"}>
+      <Link
+        href={props.session.data ? "/dashboard" : "/"}
+        className={"mr-auto text-2xl font-bold text-inherit"}
+      >
         Noot
       </Link>
       <Button
