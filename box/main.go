@@ -86,10 +86,9 @@ func main() {
 	if BoxID == "0" { // if the boxID didn't exist:
 		log.Info("This NootBOX does not seem to be enrolled.")
 		log.Info("Starting the enrollment webserver.")
-		sendMeasurements(40, 23, 59, "VZ8w9Wzzo7jdhSN4h7ygu") // debug
-		// ginEnrollmentServer()
+		ginEnrollmentServer()
 	} else {
-		// Yes, there is a box id? Continue
+		// Yes, there is already a box id.
 		// TODO: Here, you want to see if the box ID is valid, if so, attempt to login and broadcast data.
 	}
 
@@ -107,7 +106,6 @@ func main() {
 func sendAlert() {}
 
 
-// TODO: Make a function to send data to NootWeb
 func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 	// send a post request to NootWEB, that will submit the recorded data.
 	log.Info("Attempting to send recorded measurements to NootWEB...")
@@ -133,9 +131,6 @@ func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 		}
 	}(resp.Body)
 
-
-
-	// TODO: Parse the NootWEB communication and see if it was a success, otherwise, log that the interaction failed.
 	body, _ := io.ReadAll(resp.Body) // body of the communication with NootWEB
 	log.Info("NootWEB responded with: " + string(body))
 
@@ -155,10 +150,6 @@ func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 		log.Warnf("These measurements will NOT be sent to NootWEB... skipping...")
 
 	}
-
-
-
-
 }
 
 
