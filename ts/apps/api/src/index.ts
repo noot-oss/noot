@@ -121,7 +121,6 @@ app.post(
         return c.json(
           {
             error: "Failed to generate box",
-            errorCode: 1,
           },
           500
         );
@@ -138,7 +137,6 @@ app.post(
       return c.json(
         {
           error: "Failed to generate box",
-          errorCode: 1,
         },
         500
       );
@@ -153,7 +151,6 @@ app.post(
     return c.json({
       id: boxId,
       token: generatedToken,
-      errorCode: 0,
     });
   }
 );
