@@ -15,8 +15,11 @@ import (
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	PROD := false
 	VERSION := "V0.0.1" // this stays at 0.0.1 until production release v1.
+
+	// IMPORTANT VARIABLES USED THROUGHOUT THIS CODE
+	var BoxID string
+
 
 	// initiate the logging
 	logFile, err := os.OpenFile("NootBOX_logfile.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -35,13 +38,8 @@ func main() {
 	log.Info("Logging initiated!")
 
 	// Modify some parts of the code accordingly if it is running in production or development mode
-	if PROD { // running in prod
-		log.Infof("This is NootBOX, PROD_%s.", VERSION)
-		gin.SetMode(gin.ReleaseMode)
-	} else { // running in dev
-		log.Warning("WARNING: THIS CODE IS RUNNING IN DEVELOPMENT MODE!!!")
-		log.Infof("This is NootBOX, DEV_%s.", VERSION)
-	}
+	log.Infof("This is NootBOX, Version %s.", VERSION)
+	gin.SetMode(gin.ReleaseMode)
 
 	// Print the text logo
 	fmt.Printf(`|=Your NootBOX is starting up!===================================|
@@ -53,16 +51,14 @@ func main() {
 | ╚═╝  ╚═══╝ ╚═════╝  ╚═════╝    ╚═╝   ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ |
 |===Your NootBOX is starting up!===VERSION: %s===============|
 `, VERSION)
-	log.Info("Printing text logo")
+	log.Info("Printed text logo")
 
 	// Check if we have a BoxID stored.
-	// TODO: Pull BoxID from a file here
+	// TODO: Attempt to pull BoxID from file here
 	// load box id file into memory
 
-	var BoxID string // create var so we can acc access it after the below function.
-
-	BoxIDFile, err := os.Open("./NootBOXID") // Likely only work on linux, however that is the only supported platform
-	if err != nil { // if the file likely doesn't exist
+	BoxIDFile, err := os.Open("boxInfo.noot") // Likely only work on linux, however that is the only supported platform
+	if err != nil { // if the file doesn't exist or won't open for some reason
 		log.Warnf("Failed to open the Box ID storage file, Assuming BoxID = \"0\". REASON: Unknown. ERROR: %s", err)
 		BoxID = "0"
 	} else { // if the file exists
@@ -89,7 +85,7 @@ func main() {
 		ginEnrollmentServer()
 	} else {
 		// Yes, there is already a box id.
-		// TODO: Here, you want to see if the box ID is valid, if so, attempt to login and broadcast data.
+		// TODO: Here, you want to attempt to login and start the broadcast data loop.
 	}
 
 	// No box id? Start enroll procedure with a small gin webserver that says your temporary code
@@ -140,7 +136,7 @@ func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 	success := bodyJsonData["success"].(bool)
 	if success { // it worked!! (yay :33)
 		// if success, log that the interaction was a success with below statement
-		log.Info("Sent recorded measurements to NootWEB. Recorded values were CO2: " +
+		log.Infof("Sent recorded measurements to NootWEB. Recorded values were CO2: " +
 			string(rune(co2Val)) + ", Temperature: " + string(rune(tempVal)) + ", Humidity: " + string(rune(humVal)) + "." +
 			" BoxToken: " + asteriskExceptLastFive(BoxToken) + ".",
 		)
@@ -185,8 +181,8 @@ func ginEnrollmentServer() {
 			log.Fatalf("Failed to write user-given code to variable. REASON: Unknown. ERROR: %s", err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{
 				"message": "Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: " + err.Error(),
-				"error": 1,
 			})
+			return
 		}
 
 		// send a post request to NootWEB, to register this box.
@@ -197,17 +193,21 @@ func ginEnrollmentServer() {
 		client := &http.Client{} // initiate http client
 		resp, err := client.Do(req) // send the request we just built
 		if err != nil {
-			log.Error("Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: %s", err)
+			log.Errorf("Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: %s", err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{
 				"message": "Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: " + err.Error(),
-				"error": 1,
 			})
+			return
 		}
 
 		defer func(Body io.ReadCloser) { // close our connection once data is sent.
 			err := Body.Close()
 			if err != nil {
 				log.Errorf("Failed to send box code to NootWEB. REASON: Couldn't defer 'Body'. ERROR: %s", err)
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"message": "Failed to send box code to NootWeb. REASON: UNKNOWN. ERROR: " + err.Error(),
+				})
+				return
 			}
 		}(resp.Body)
 
@@ -215,25 +215,58 @@ func ginEnrollmentServer() {
 		// TODO: Parse the NootWEB communication and see if it was a success, if so, send the below indented JSON, otherwise, send something telling the user the interaction has failed.
 		body, _ := io.ReadAll(resp.Body) // body of the communication with NootWEB
 		log.Info("NootWEB responded with: " + string(body))
-		fmt.Println(string(body)) // Debug: print the body of the communication with NootWEB
-		//var bodyJson map[string]any
-		//err = json.Unmarshal([]byte(body), &bodyJson)
-		//if err != nil {
-		//	log.Errorf("Failed to send box code to NootWEB. REASON: Couldn't defer 'Body'. ERROR: %s", err)
-		//}
 
-		// TODO: edit the below response to the NBFrontend to be better or smth idfk.
+		log.Info("Attempting to parse what NootWeb responded with.")
+		nwStatusCodeOK := resp.StatusCode >= 200 && resp.StatusCode < 200
+		if nwStatusCodeOK { // there is no error in the response (LETS FUCKING GOOOOO :33)
+			// parse and get the BoxID and BoxToken.
+			var nwRespJson map[string]interface{}
+			err = json.Unmarshal([]byte(string(body)), &nwRespJson)
+			if err != nil {
+				log.Errorf("Failed to parse NootWeb response. REASON: UNKNOWN. ERROR: %s", err)
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"message":  "Failed to parse the NootWeb server's response.",
+				})
+				return
+			}
 
-		// say on the GWS that the box has been registered.
-		//TODO: change boxid value in below json
-		c.IndentedJSON(http.StatusCreated, gin.H{
-			"message":  "This NootBOX has been registered as box id: \"nb-ru-8302-2746\"!",
-			"sentCode": code,
-			"error":    0, // there is no error, hence the number 0.
-		})
+			// write these to file
+			NBBoxInfoFile, err := os.OpenFile("boxInfo.noot", os.O_RDWR|os.O_CREATE, 0666)
+			if err != nil {
+				log.Fatalf("Failed to create or open the \"boxInfo.noot\" file. REASON: Unknown. ERROR: %s", err)
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"message": "Failed to create or open the \"boxInfo.noot\" file. REASON: Unknown. ERROR: " + err.Error(),
+				})
+				return
+			}
+			jsonToWrite := fmt.Sprintf(`{"boxid": "%s", "boxtoken": "%s"}`, nwRespJson["id"].(string), nwRespJson["token"].(string))
+			_, err = NBBoxInfoFile.WriteString(jsonToWrite)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"message": "Failed to write to the \"boxInfo.noot\" file. REASON: Unknown. ERROR: " + err.Error(),
+				})
+				return
+			}
+			c.IndentedJSON(http.StatusCreated, gin.H{
+				"message": "NootBox created! " +
+					"The details have been written to local storage. " +
+					"Just restart the application, and this box will connect!",
+			})
+			return
+
+		} else { // there was a non 2** status code :((
+			var nwRepErr map[string]interface{}
+			_ = json.Unmarshal([]byte(string(body)), &nwRepErr)
+			nwRepErrMsg := nwRepErr["error"].(string)
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"message": "NootWeb could not enroll this NootBox. REASON: UNKNOWN. ERROR: " + nwRepErrMsg,
+			})
+			return
+		}
 	})
 
 	// run the webserver
+	fmt.Println("Gin webserver running on http://0.0.0.0:17002")
 	err := gws.Run("0.0.0.0:17002") // this runs gws publicly on devices private ip and port 17002
 	if err != nil {
 		log.Fatalf("Failed to start the Gin enrollment webserver. REASON: Webserver startup failed.. ERROR: %s", err)
