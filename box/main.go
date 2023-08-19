@@ -61,7 +61,9 @@ func main() {
 	if err != nil { // if the file doesn't exist or won't open for some reason
 		log.Warnf("Failed to open the Box ID storage file, Assuming BoxID = \"0\". REASON: Unknown. ERROR: %s", err)
 		BoxID = "0"
-	} else { // if the file exists
+	} else {
+		// TODO: file exists, read and parse into vars BoxID and BoxToken
+		// if the file exists
 		// read first line of the BoxID file
 		scanner := bufio.NewScanner(BoxIDFile)
 		for scanner.Scan() {
@@ -77,6 +79,7 @@ func main() {
 				log.Errorf("Failed to close the Box ID storage file, Assuming BoxID = \"%s\". REASON: Unknown. ERROR: %s", BoxID, err)
 			}
 		}(BoxIDFile)
+
 	}
 
 	if BoxID == "0" { // if the boxID didn't exist:
@@ -88,13 +91,10 @@ func main() {
 		// TODO: Here, you want to attempt to login and start the broadcast data loop.
 	}
 
-	// No box id? Start enroll procedure with a small gin webserver that says your temporary code
-
-
 	// Try to login
-	// login failed? Start enroll procedure with gin webserver
+	// login failed? Start enroll procedure
 
-	// login success? continue
+	// login success? start feedback loop
 }
 
 
@@ -249,7 +249,7 @@ func ginEnrollmentServer() {
 			}
 			c.IndentedJSON(http.StatusCreated, gin.H{
 				"message": "NootBox created! " +
-					"The details have been written to local storage. " +
+					"The details have been written to local storage." +
 					"Just restart the application, and this box will connect!",
 			})
 			return
@@ -258,10 +258,16 @@ func ginEnrollmentServer() {
 			var nwRepErr map[string]interface{}
 			_ = json.Unmarshal([]byte(string(body)), &nwRepErr)
 			nwRepErrMsg := nwRepErr["error"].(string)
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{
-				"message": "NootWeb could not enroll this NootBox. REASON: UNKNOWN. ERROR: " + nwRepErrMsg,
-			})
-			return
+			if nwRepErrMsg == "Invalid code" {
+				c.IndentedJSON(http.StatusUnauthorized, gin.H{
+					"message": "It seems like the code you entered is invalid. Please try again.",
+				})
+			} else {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"message": "NootWeb could not enroll this NootBox. REASON: UNKNOWN. ERROR: " + nwRepErrMsg,
+				})
+				return
+			}
 		}
 	})
 
