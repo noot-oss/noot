@@ -114,6 +114,7 @@ app.post(
           ownerId: boxInitFound.creatorId,
           token: generatedToken,
           name: `NootBOX-${boxId.substring(0, 4)}`,
+          verificationCode: code,
         },
       })
       .catch((e) => {
