@@ -48,7 +48,7 @@ const Dashboard = () => {
       <DashboardInnerPage
         userBoxes={boxesToRender}
         code={userCode.data ? userCode.data.verificationCode : undefined}
-        refetch={refetchData}
+        handleContinue={refetchData}
         isFetching={isFetchingUserBoxes}
         fetchedMessage={errorToDisplay}
       />
