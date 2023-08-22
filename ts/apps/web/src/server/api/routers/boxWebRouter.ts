@@ -5,6 +5,7 @@ import {
 } from "~web/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import crypto from "node:crypto";
+import { z } from "zod";
 
 export const boxWebRouter = createTRPCRouter({
   getUserBoxes: rateLimitedProtectedProcedure.query(async ({ ctx }) => {
@@ -21,6 +22,26 @@ export const boxWebRouter = createTRPCRouter({
       updatedAt: box.updatedAt,
     })) satisfies UserBoxReturned[];
   }),
+  getBoxByVerificationCode: rateLimitedProtectedProcedure
+    .input(
+      z.object({
+        verificationCode: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        return ctx.prisma.box.findMany({
+          where: {
+            ownerId: ctx.session.user.id,
+            verificationCode: input.verificationCode,
+          },
+        });
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    }),
   fetchCode: protectedProcedure.query(async ({ ctx }) => {
     console.log(ctx.ip, "ip");
     if (!ctx.ip) {

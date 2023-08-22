@@ -31,7 +31,12 @@ const DashboardBox = ({ box }: { box: Box }) => {
 export const DashboardMultiBox = (props: { userBoxes: Box[] }) => {
   return (
     <div className="flex flex-col gap-8">
-      <H1>Dashboard</H1>
+      <div className="flex flex-row items-center justify-between">
+        <H1>Dashboard</H1>
+        <Button size={"lg"} asChild variant={"default"}>
+          <Link href="/create">Create box</Link>
+        </Button>
+      </div>
       <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
         {props.userBoxes.map((box) => (
           <li key={box.id}>

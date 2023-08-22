@@ -64,12 +64,13 @@ model VerificationToken {
 
 // box
 model Box {
-  id        String   @unique
-  name      String
-  ownerId   String
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String   @unique
+  name             String
+  ownerId          String
+  token            String   @unique
+  verificationCode String   @default("00000000") // Code that was used to create the box
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model BoxInit {

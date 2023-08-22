@@ -107,40 +107,15 @@ app.post(
     const boxId = nanoid();
     const generatedToken = nanoid();
 
-    const box = db.box
-      .create({
-        data: {
-          id: boxId,
-          ownerId: boxInitFound.creatorId,
-          token: generatedToken,
-          name: `NootBOX-${boxId.substring(0, 4)}`,
-        },
-      })
-      .catch((e) => {
-        console.error(e);
-        return c.json(
-          {
-            error: "Failed to generate box",
-          },
-          500
-        );
-      });
-
-    const fetchedBox = await db.box.findUnique({
-      where: {
+    const box = await db.box.create({
+      data: {
         id: boxId,
+        ownerId: boxInitFound.creatorId,
         token: generatedToken,
+        name: `NootBOX-${boxId.substring(0, 4)}`,
+        verificationCode: code,
       },
     });
-
-    if (!fetchedBox) {
-      return c.json(
-        {
-          error: "Failed to generate box",
-        },
-        500
-      );
-    }
 
     await db.boxInit.delete({
       where: {

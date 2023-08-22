@@ -22,3 +22,5 @@ go.work
 
 .idea
 NootBOX_logfile.log
+
+node_modules
