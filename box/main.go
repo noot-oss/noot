@@ -5,11 +5,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/aldernero/scd4x"
 	"github.com/gin-gonic/gin"       // For creating the enrollment web server
 	log "github.com/sirupsen/logrus" // For logging
 	"io"
 	"net/http"
 	"os"
+	"periph.io/x/conn/v3/i2c"
+	"periph.io/x/conn/v3/i2c/i2creg"
 	"strings"
 )
 
@@ -88,14 +91,41 @@ func main() {
 		// TODO: Here, you want to attempt to login and start the broadcast data loop.
 	}
 
-	// Try to login
-	// login failed? Start enroll procedure
+	// start the broadcast data function loop
 
-	// login success? start feedback loop
 }
 
 
-// TODO: Make a function to send warnings/alerts to NootWeb NOTE: WAIT FOR ENDPOINT TO BE CREATED.
+func broadcastDataLoop(BoxID string, BoxToken string) {}
+
+
+func takeMeasurement() (uint16, float64, float64) {
+	bus, err := i2creg.Open("")  // test opening the bus
+	if err != nil {
+		log.Fatalf("Failed while opening bus: %v", err)
+	}
+	defer func(bus i2c.BusCloser) {
+		err := bus.Close()
+		if err != nil {
+			log.Fatalf("Failed while closing bus: %v", err)
+		}
+	}(bus) // close the bus
+
+	// initiate the sensor
+	sensor, err := scd4x.SensorInit(bus, false)  // DO NOT use Fahrenheit, all temps are stored in Celsius and translated with mathematical equation.
+	if err != nil {
+		log.Fatalf("Failed while initializing sensor: %v", err)
+	}
+	sensorData, err := sensor.ReadMeasurement()
+	if err != nil {
+		log.Fatalf("Failed while reading measurement: %v", err)
+	}
+
+	return sensorData.CO2, sensorData.Temp, sensorData.Rh
+}
+
+
+// TODO: Make a function to send warnings/alerts to NootWeb
 func sendAlert() {}
 
 
@@ -146,8 +176,7 @@ func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 }
 
 
-// TODO: Make a function to take measurements from the device sensors
-func takeMeasurements() {}
+
 
 
 // This function is used when you want to create a webserver for the user to enroll their box onto.
@@ -209,7 +238,6 @@ func ginEnrollmentServer() {
 		}(resp.Body)
 
 
-		// TODO: Parse the NootWEB communication and see if it was a success, if so, send the below indented JSON, otherwise, send something telling the user the interaction has failed.
 		body, _ := io.ReadAll(resp.Body) // body of the communication with NootWEB
 		log.Info("NootWEB responded with: " + string(body))
 
