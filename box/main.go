@@ -54,11 +54,8 @@ func main() {
 	log.Info("Printed text logo")
 
 	// Check if we have a BoxID stored.
-	// TODO: Attempt to pull BoxID from file here
-	// load box id file into memory
-
 	BoxIDFile, err := os.Open("boxInfo.noot") // Likely only work on linux, however that is the only supported platform
-	if err != nil { // if the file doesn't exist or won't open for some reason
+	if err != nil { // if the file doesn't exist or won't open for some reason, assume un-enrolled.
 		log.Warnf("Failed to open the Box ID storage file, Assuming BoxID = \"0\". REASON: Unknown. ERROR: %s", err)
 		BoxID = "0"
 	} else {
@@ -162,7 +159,7 @@ func ginEnrollmentServer() {
 	// TODO: Make this return a HTML file
 	gws.GET("/", func(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, gin.H{
-			"message": "Hello!, this is the webserver for NootBOX.",
+			"message": "Привет! Это веб-сервер в NootBox.",
 			"endpoints": gin.H{
 				"Enroll a NootBOX": gin.H{
 					"method": "POST",
@@ -217,7 +214,7 @@ func ginEnrollmentServer() {
 		log.Info("NootWEB responded with: " + string(body))
 
 		log.Info("Attempting to parse what NootWeb responded with.")
-		nwStatusCodeOK := resp.StatusCode >= 200 && resp.StatusCode < 200
+		nwStatusCodeOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 		if nwStatusCodeOK { // there is no error in the response (LETS FUCKING GOOOOO :33)
 			// parse and get the BoxID and BoxToken.
 			var nwRespJson map[string]interface{}
@@ -239,6 +236,7 @@ func ginEnrollmentServer() {
 				})
 				return
 			}
+
 			jsonToWrite := fmt.Sprintf(`{"boxid": "%s", "boxtoken": "%s"}`, nwRespJson["id"].(string), nwRespJson["token"].(string))
 			_, err = NBBoxInfoFile.WriteString(jsonToWrite)
 			if err != nil {
@@ -248,15 +246,20 @@ func ginEnrollmentServer() {
 				return
 			}
 			c.IndentedJSON(http.StatusCreated, gin.H{
-				"message": "NootBox created! " +
-					"The details have been written to local storage." +
+				"message": "NootBox created! The details have been written to local storage. " +
 					"Just restart the application, and this box will connect!",
 			})
 			return
 
 		} else { // there was a non 2** status code :((
 			var nwRepErr map[string]interface{}
-			_ = json.Unmarshal([]byte(string(body)), &nwRepErr)
+			err = json.Unmarshal([]byte(string(body)), &nwRepErr)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{
+					"message": "Failed to parse what NootWeb responded with. REASON: Unknown. ERROR: " + err.Error(),
+				})
+				return
+			}
 			nwRepErrMsg := nwRepErr["error"].(string)
 			if nwRepErrMsg == "Invalid code" {
 				c.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -264,7 +267,7 @@ func ginEnrollmentServer() {
 				})
 			} else {
 				c.IndentedJSON(http.StatusInternalServerError, gin.H{
-					"message": "NootWeb could not enroll this NootBox. REASON: UNKNOWN. ERROR: " + nwRepErrMsg,
+					"message": "NootWeb could not enroll this NootBox. REASON: UNKNOWN. ERROR: " + string(nwRepErrMsg),
 				})
 				return
 			}
