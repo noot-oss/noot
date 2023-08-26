@@ -188,7 +188,7 @@ func ginEnrollmentServer() {
 	// TODO: Make this return a HTML file
 	gws.GET("/", func(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, gin.H{
-			"message": "Привет! Это веб-сервер в NootBox.",
+			"message": "Hello! This is a web server in NootBox",
 			"endpoints": gin.H{
 				"Enroll a NootBOX": gin.H{
 					"method": "POST",
