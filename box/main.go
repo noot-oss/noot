@@ -5,23 +5,26 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/aldernero/scd4x"
+	"github.com/aldernero/scd4x"     // To interact with the scd4x sensor
 	"github.com/gin-gonic/gin"       // For creating the enrollment web server
 	log "github.com/sirupsen/logrus" // For logging
 	"io"
-	"net/http"
+	"net/http"                       // For sending stuff to the internet
 	"os"
 	"periph.io/x/conn/v3/i2c"
 	"periph.io/x/conn/v3/i2c/i2creg"
 	"strings"
+	"time"
 )
 
+// TODO: CORRECT ALL ERROR MESSAGES TO BE MORE SIMPLISTIC AND EASY TO UNDERSTAND.
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
 	VERSION := "V0.0.1" // this stays at 0.0.1 until production release v1.
 
 	// IMPORTANT VARIABLES USED THROUGHOUT THIS CODE
 	var BoxID string
+	var BoxToken string
 
 
 	// initiate the logging
@@ -62,15 +65,27 @@ func main() {
 		log.Warnf("Failed to open the Box ID storage file, Assuming BoxID = \"0\". REASON: Unknown. ERROR: %s", err)
 		BoxID = "0"
 	} else {
-		// TODO: file exists, read and parse into vars BoxID and BoxToken
 		// if the file exists
-		// read first line of the BoxID file
-		scanner := bufio.NewScanner(BoxIDFile)
+		var fileData string // var for file content
+		scanner := bufio.NewScanner(BoxIDFile) // read first line of the file
 		for scanner.Scan() {
 			fmt.Println(scanner.Text())
-			BoxID = scanner.Text() // pull the BoxID
+			fileData = scanner.Text() // pull the BoxID
 		}
+
+		// parse boxID from fileText
+		var fileDataJson map[string]interface{}
+		err := json.Unmarshal([]byte(fileData), &fileDataJson)
+		if err != nil {log.Fatalf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s", err)}
+
+		BoxID, ok := fileDataJson["boxid"].(string)
+		if !ok {log.Fatalf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s", err)}
+		BoxToken, ok := fileDataJson["boxtoken"].(string)
+		if !ok {log.Fatalf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s", err)}
+
+		// log the boxID
 		log.Infof("BoxID appears to be \"%s\".", BoxID)
+		log.Infof("BoxToken appears to be \"%s\".", asteriskExceptLastFive(BoxToken))
 
 		// close file
 		defer func(BoxIDFile *os.File) {
@@ -88,17 +103,41 @@ func main() {
 		ginEnrollmentServer()
 	} else {
 		// Yes, there is already a box id.
-		// TODO: Here, you want to attempt to login and start the broadcast data loop.
+		// Start the broadcast data function loop
+		log.Info("This NootBOX appears to be enrolled.")
+		log.Info("Starting the broadcast data function loop.")
+		delay := 30 // delay between measurements in seconds
+		broadcastDataLoop(BoxToken, delay)
 	}
-
-	// start the broadcast data function loop
 
 }
 
 
-func broadcastDataLoop(BoxID string, BoxToken string) {}
+
+// TODO: Power optimise this at some point (maybe) (probably not) (but maybe) БЛЯТЬ!!!!!!!!!!!
+func broadcastDataLoop(BoxToken string, delay int) {
+	// create vars for the measurements
+	var co2Val uint16
+	var tempVal float64
+	var humVal float64
+
+	// TODO: Add error corrections to this function
+
+	// create a loop that will run forever
+	for {
+		// take a measurement
+		co2Val, tempVal, humVal = takeMeasurement()
+
+		// send the measurements to NootWEB
+		sendMeasurements(int(co2Val), int(tempVal), int(humVal), BoxToken)
+
+		// wait for a bit
+		time.Sleep(time.Duration(delay) * time.Second)
+	}
+}
 
 
+// takeMeasurement takes a measurement from the sensor and returns the CO2, Temperature and Humidity values.
 func takeMeasurement() (uint16, float64, float64) {
 	bus, err := i2creg.Open("")  // test opening the bus
 	if err != nil {
@@ -174,9 +213,6 @@ func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 
 	}
 }
-
-
-
 
 
 // This function is used when you want to create a webserver for the user to enroll their box onto.
@@ -324,5 +360,6 @@ func asteriskExceptLastFive(input string) string {
 	// Combine the asterisks and the last five characters to create the hidden string
 	hiddenString := asterisks + lastFive
 
+	// Return the string
 	return hiddenString
 }

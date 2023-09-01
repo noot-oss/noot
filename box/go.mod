@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/aldernero/scd4x v0.0.0-20220130180236-4b75adf24948 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
@@ -32,4 +33,5 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	periph.io/x/conn/v3 v3.7.0 // indirect
 )
