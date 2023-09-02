@@ -9,23 +9,50 @@ import (
 	"github.com/gin-gonic/gin"       // For creating the enrollment web server
 	log "github.com/sirupsen/logrus" // For logging
 	"io"
-	"net/http"                       // For sending stuff to the internet
 	"os"
 	"periph.io/x/conn/v3/i2c"
 	"periph.io/x/conn/v3/i2c/i2creg"
 	"strings"
 	"time"
+
+	"machine"
+	"tinygo.org/x/drivers/net"      // Most tinygo networking drivers
+	"tinygo.org/x/drivers/net/http" // Tinygo only module for interaction with internet.
+	"tinygo.org/x/drivers/wifinina" // Tinygo only module for connecting to internet driver.
 )
 
+// TODO: SPLIT PROJECT INTO MULTIPLE FILES.
 // TODO: CORRECT ALL ERROR MESSAGES TO BE MORE SIMPLISTIC AND EASY TO UNDERSTAND.
+// TODO: WHERE NECESSARY, SEND ALERTS TO NOOTWEB.
+// TODO: MAKE SCRIPT STORE IMPORTANT VALUES IN EEPROM
+// TODO: ADD A FUNCTION TO CONNECT TO THE INTERNET.
+
+// IMPORTANT VARIABLES USED THROUGHOUT THIS CODE
+var BoxID string
+var BoxToken string
+var wifiSSID string     // Name of the Wi-Fi network
+var wifiPassword string // Password of the Wi-Fi network
+
+// Connect to the internet.
+// These are the default pins for the Arduino Nano33 IoT.
+// Change these to connect to a different UART or pins for the ESP8266/ESP32
+var (
+	// These are the default pins for the Arduino Nano33 IoT.
+	spi = machine.NINA_SPI
+
+	// This is the ESP chip that has the WIFININA firmware flashed on it
+	adaptor *wifinina.Device
+)
+
+var buf [0x400]byte
+
+var lastRequestTime time.Time
+var conn net.Conn
+
+
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.0.1" // this stays at 0.0.1 until production release v1.
-
-	// IMPORTANT VARIABLES USED THROUGHOUT THIS CODE
-	var BoxID string
-	var BoxToken string
-
+	VERSION := "V0.2.0"
 
 	// initiate the logging
 	logFile, err := os.OpenFile("NootBOX_logfile.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -57,8 +84,18 @@ func main() {
 | ╚═╝  ╚═══╝ ╚═════╝  ╚═════╝    ╚═╝   ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ |
 |===Your NootBOX is starting up!===VERSION: %s===============|
 `, VERSION)
-	log.Info("Printed text logo")
 
+	log.Info("Attempting to connect to the internet...")
+	// idk what this shit does, but It's supposed to work.
+	setupWifi()
+	http.SetBuf(buf[:])
+	waitSerial()
+	connectToAP()
+	displayIP()
+
+
+
+	log.Info("Checking if \"boxInfo.noot\" file already exists.")
 	// Check if we have a BoxID stored.
 	BoxIDFile, err := os.Open("boxInfo.noot") // Likely only work on linux, however that is the only supported platform
 	if err != nil { // if the file doesn't exist or won't open for some reason, assume un-enrolled.
@@ -219,12 +256,24 @@ func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 func ginEnrollmentServer() {
 	// Create a variable so we can control and add stuff to the gin server.
 	gws := gin.Default()
+	gws.LoadHTMLGlob("html/*")
+
 
 	// Webserver URL routes go here
 	// TODO: Make this return a HTML file
 	gws.GET("/", func(c *gin.Context) {
+		// get the user's language preference
+		prefLang := parseAcceptLanguage(c.GetHeader("Accept-Language"))
+		indexLangFile := strings.ToLower(prefLang) + ".index.html"
+
+		// return the index file
+		c.HTML(http.StatusOK, indexLangFile, gin.H{})
+	})
+
+	// This returns the routes usable for NootBox web ui.
+	gws.GET("/routes", func(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, gin.H{
-			"message": "Hello! This is a web server in NootBox",
+			"message": "Hello! This is the NootBOX enrollment webserver!",
 			"endpoints": gin.H{
 				"Enroll a NootBOX": gin.H{
 					"method": "POST",
@@ -362,4 +411,94 @@ func asteriskExceptLastFive(input string) string {
 
 	// Return the string
 	return hiddenString
+}
+
+
+// parseAcceptLanguage parses the "Accept-Language" header to get the preferred language.
+func parseAcceptLanguage(acceptLanguage string) string {
+	// THIS FUNCTION WAS GENERATED USING CHAT-GPT
+	// Split the header by commas to separate language preferences
+	languages := strings.Split(acceptLanguage, ",")
+
+	// Iterate through the language preferences and extract the language code
+	for _, language := range languages {
+	// Split each preference by semicolon to get the language code and quality
+	parts := strings.Split(strings.TrimSpace(language), ";")
+
+	// The language code is the first part (e.g., "en-US" in "en-US;q=0.8")
+	languageCode := parts[0]
+
+	// Remove any additional parameters (e.g., quality) and return the language code
+	return languageCode[:2]
+}
+
+	// Return a default language if no preference is found
+	return "en" // Default to English if no preference is found
+}
+
+func setupWifi() {
+	// Configure SPI for 8Mhz, Mode 0, MSB First
+	spi.Configure(machine.SPIConfig{
+		Frequency: 8 * 1e6,
+		SDO:       machine.NINA_SDO,
+		SDI:       machine.NINA_SDI,
+		SCK:       machine.NINA_SCK,
+	})
+
+	adaptor = wifinina.New(spi,
+		machine.NINA_CS,
+		machine.NINA_ACK,
+		machine.NINA_GPIO0,
+		machine.NINA_RESETN)
+	adaptor.Configure()
+}
+
+// Wait for user to open serial console
+func waitSerial() {
+	for !machine.Serial.DTR() {
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
+const retriesBeforeFailure = 3
+
+// Connect to access point
+func connectToAP() {
+	time.Sleep(2 * time.Second)
+	var err error
+	for i := 0; i < retriesBeforeFailure; i++ {
+		println("Connecting to " + wifiSSID)
+		err = adaptor.ConnectToAccessPoint(wifiSSID, wifiPassword, 10*time.Second)
+		if err == nil {
+			println("Connected.")
+			log.Info("Connected to " + wifiSSID)
+
+			return
+		}
+	}
+
+	// error connecting to AP
+	failMessage(err.Error())
+}
+
+func displayIP() {
+	ip, _, _, err := adaptor.GetIP()
+	for ; err != nil; ip, _, _, err = adaptor.GetIP() {
+		messageWifi(err.Error())
+		time.Sleep(1 * time.Second)
+	}
+	messageWifi("IP address: " + ip.String())
+	log.Info("IP address: " + ip.String())
+	fmt.Println("IP address: " + ip.String())
+}
+
+func messageWifi(msg string) {
+	println(msg, "\r")
+}
+
+func failMessage(msg string) {
+	for {
+		println(msg)
+		time.Sleep(1 * time.Second)
+	}
 }
