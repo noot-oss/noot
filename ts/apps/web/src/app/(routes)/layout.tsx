@@ -2,7 +2,7 @@
 import { LayoutWithNavAndFooter } from "~web/components/layout/Layouts";
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
-  <LayoutWithNavAndFooter>{children}</LayoutWithNavAndFooter>
+  <LayoutWithNavAndFooter shouldMouseGlow>{children}</LayoutWithNavAndFooter>
 );
 
 export default Layout;
