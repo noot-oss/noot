@@ -5,10 +5,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/aldernero/scd4x"     // To interact with the scd4x sensor
-	"github.com/gin-gonic/gin"       // For creating the enrollment web server
-	log "github.com/sirupsen/logrus" // For logging
+	"github.com/aldernero/scd4x"
+	"github.com/gin-gonic/gin"
 	"io"
+	"log"
 	"os"
 	"periph.io/x/conn/v3/i2c"
 	"periph.io/x/conn/v3/i2c/i2creg"
@@ -16,9 +16,9 @@ import (
 	"time"
 
 	"machine"
-	"tinygo.org/x/drivers/net"      // Most tinygo networking drivers
-	"tinygo.org/x/drivers/net/http" // Tinygo only module for interaction with internet.
-	"tinygo.org/x/drivers/wifinina" // Tinygo only module for connecting to internet driver.
+	"tinygo.org/x/drivers/net"
+	"tinygo.org/x/drivers/net/http"
+	"tinygo.org/x/drivers/wifinina"
 )
 
 // TODO: SPLIT PROJECT INTO MULTIPLE FILES.
@@ -49,7 +49,6 @@ var buf [0x400]byte
 var lastRequestTime time.Time
 var conn net.Conn
 
-
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
 	VERSION := "V0.2.0"
@@ -57,21 +56,19 @@ func main() {
 	// initiate the logging
 	logFile, err := os.OpenFile("NootBOX_logfile.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalf("Failed to create or open the logfile. REASON: Unknown. ERROR: %s", err)
 		fmt.Printf("Failed to create or open the logfile. REASON: Unknown. ERROR: %s\n", err)
 		return
 	}
 
 	// set the logging output to a file.
 	log.SetOutput(logFile)
-	log.Info("==========================================================================")
-	log.Info("NootBOX application has started.")
-	log.Info("Set the logging output to a logfile.")
-	log.SetLevel(log.InfoLevel)
-	log.Info("Logging initiated!")
+	fmt.Println("==========================================================================")
+	fmt.Println("NootBOX application has started.")
+	fmt.Println("Set the logging output to a logfile.")
+	fmt.Println("Logging initiated!")
 
 	// Modify some parts of the code accordingly if it is running in production or development mode
-	log.Infof("This is NootBOX, Version %s.", VERSION)
+	fmt.Printf("This is NootBOX, Version %s.\n", VERSION)
 	gin.SetMode(gin.ReleaseMode)
 
 	// Print the text logo
@@ -85,7 +82,7 @@ func main() {
 |===Your NootBOX is starting up!===VERSION: %s===============|
 `, VERSION)
 
-	log.Info("Attempting to connect to the internet...")
+	fmt.Println("Attempting to connect to the internet...")
 	// idk what this shit does, but It's supposed to work.
 	setupWifi()
 	http.SetBuf(buf[:])
@@ -93,17 +90,15 @@ func main() {
 	connectToAP()
 	displayIP()
 
-
-
-	log.Info("Checking if \"boxInfo.noot\" file already exists.")
+	fmt.Println("Checking if \"boxInfo.noot\" file already exists.")
 	// Check if we have a BoxID stored.
 	BoxIDFile, err := os.Open("boxInfo.noot") // Likely only work on linux, however that is the only supported platform
-	if err != nil { // if the file doesn't exist or won't open for some reason, assume un-enrolled.
-		log.Warnf("Failed to open the Box ID storage file, Assuming BoxID = \"0\". REASON: Unknown. ERROR: %s", err)
+	if err != nil {                           // if the file doesn't exist or won't open for some reason, assume un-enrolled.
+		fmt.Printf("Failed to open the Box ID storage file, Assuming BoxID = \"0\". REASON: Unknown. ERROR: %s\n", err)
 		BoxID = "0"
 	} else {
 		// if the file exists
-		var fileData string // var for file content
+		var fileData string                    // var for file content
 		scanner := bufio.NewScanner(BoxIDFile) // read first line of the file
 		for scanner.Scan() {
 			fmt.Println(scanner.Text())
@@ -113,43 +108,47 @@ func main() {
 		// parse boxID from fileText
 		var fileDataJson map[string]interface{}
 		err := json.Unmarshal([]byte(fileData), &fileDataJson)
-		if err != nil {log.Fatalf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s", err)}
+		if err != nil {
+			fmt.Printf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s\n", err)
+		}
 
 		BoxID, ok := fileDataJson["boxid"].(string)
-		if !ok {log.Fatalf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s", err)}
+		if !ok {
+			fmt.Printf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s\n", err)
+		}
 		BoxToken, ok := fileDataJson["boxtoken"].(string)
-		if !ok {log.Fatalf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s", err)}
+		if !ok {
+			fmt.Printf("Failed to parse the Box ID storage file. REASON: Unknown. ERROR: %s\n", err)
+		}
 
 		// log the boxID
-		log.Infof("BoxID appears to be \"%s\".", BoxID)
-		log.Infof("BoxToken appears to be \"%s\".", asteriskExceptLastFive(BoxToken))
+		fmt.Printf("BoxID appears to be \"%s\".\n", BoxID)
+		fmt.Printf("BoxToken appears to be \"%s\".\n", asteriskExceptLastFive(BoxToken))
 
 		// close file
 		defer func(BoxIDFile *os.File) {
 			err := BoxIDFile.Close()
 			if err != nil {
-				log.Errorf("Failed to close the Box ID storage file, Assuming BoxID = \"%s\". REASON: Unknown. ERROR: %s", BoxID, err)
+				fmt.Printf("Failed to close the Box ID storage file, Assuming BoxID = \"%s\". REASON: Unknown. ERROR: %s\n", BoxID, err)
 			}
 		}(BoxIDFile)
 
 	}
 
 	if BoxID == "0" { // if the boxID didn't exist:
-		log.Info("This NootBOX does not seem to be enrolled.")
-		log.Info("Starting the enrollment webserver.")
+		fmt.Println("This NootBOX does not seem to be enrolled.")
+		fmt.Println("Starting the enrollment webserver.")
 		ginEnrollmentServer()
 	} else {
 		// Yes, there is already a box id.
 		// Start the broadcast data function loop
-		log.Info("This NootBOX appears to be enrolled.")
-		log.Info("Starting the broadcast data function loop.")
+		fmt.Println("This NootBOX appears to be enrolled.")
+		fmt.Println("Starting the broadcast data function loop.")
 		delay := 30 // delay between measurements in seconds
 		broadcastDataLoop(BoxToken, delay)
 	}
 
 }
-
-
 
 // TODO: Power optimise this at some point (maybe) (probably not) (but maybe) БЛЯТЬ!!!!!!!!!!!
 func broadcastDataLoop(BoxToken string, delay int) {
@@ -173,65 +172,62 @@ func broadcastDataLoop(BoxToken string, delay int) {
 	}
 }
 
-
 // takeMeasurement takes a measurement from the sensor and returns the CO2, Temperature and Humidity values.
 func takeMeasurement() (uint16, float64, float64) {
-	bus, err := i2creg.Open("")  // test opening the bus
+	bus, err := i2creg.Open("") // test opening the bus
 	if err != nil {
-		log.Fatalf("Failed while opening bus: %v", err)
+		fmt.Printf("Failed while opening bus: %v\n", err)
 	}
 	defer func(bus i2c.BusCloser) {
 		err := bus.Close()
 		if err != nil {
-			log.Fatalf("Failed while closing bus: %v", err)
+			fmt.Printf("Failed while closing bus: %v\n", err)
 		}
 	}(bus) // close the bus
 
 	// initiate the sensor
-	sensor, err := scd4x.SensorInit(bus, false)  // DO NOT use Fahrenheit, all temps are stored in Celsius and translated with mathematical equation.
+	sensor, err := scd4x.SensorInit(bus, false) // DO NOT use Fahrenheit, all temps are stored in Celsius and translated with mathematical equation.
 	if err != nil {
-		log.Fatalf("Failed while initializing sensor: %v", err)
+		fmt.Printf("Failed while initializing sensor: %v\n", err)
 	}
 	sensorData, err := sensor.ReadMeasurement()
 	if err != nil {
-		log.Fatalf("Failed while reading measurement: %v", err)
+		fmt.Printf("Failed while reading measurement: %v\n", err)
 	}
 
 	return sensorData.CO2, sensorData.Temp, sensorData.Rh
 }
 
-
 // TODO: Make a function to send warnings/alerts to NootWeb
 func sendAlert() {}
 
-
 func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 	// send a post request to NootWEB, that will submit the recorded data.
-	log.Info("Attempting to send recorded measurements to NootWEB...")
+	fmt.Println("Attempting to send recorded measurements to NootWEB...")
 	postURL := "https://api.noot.site/push" // the url to send the post req to
 	jsonStr := fmt.Sprintf(
 		"{\"co2\": %d, \"temp\":%d, \"humidity\": %d, \"token\": \"%s\"}",
 		co2Val, tempVal, humVal, BoxToken,
 	) // create a var to hold the JSON we will send
 	req, err := http.NewRequest("POST", postURL, bytes.NewBuffer([]byte(jsonStr))) // create the request here.
-	req.Header.Set("Content-Type", "application/json") // tell the server we are sending JSON
-	client := &http.Client{} // initiate http client
-	resp, err := client.Do(req) // send the request we just built
+	req.Header.Set("Content-Type", "application/json")                             // tell the server we are sending JSON
+	client := &http.Client{}                                                       // initiate http client
+	resp, err := client.Do(req)                                                    // send the request we just built
 	if err != nil {
-		log.Errorf("Failed to send recorded measurements to NootWEB. REASON: UNKNOWN. ERROR: %s", err)
-		log.Warnf("These measurements will NOT be sent to NootWEB... skipping...")
+		fmt.Printf("Failed to send recorded measurements to NootWEB. REASON: UNKNOWN. ERROR: %s\n", err)
+		fmt.Println("These measurements will NOT be sent to NootWEB... skipping...")
 		return
 	}
 
 	defer func(Body io.ReadCloser) { // close our connection once data is sent.
 		err := Body.Close()
 		if err != nil {
-			log.Errorf("Failed to send recorded measurements to NootWEB. REASON: Couldn't defer 'Body'. ERROR: %s", err)
+			fmt.Printf("Failed to send recorded measurements to NootWEB. REASON: Couldn't defer 'Body'. ERROR: %s\n", err)
 		}
 	}(resp.Body)
 
 	body, _ := io.ReadAll(resp.Body) // body of the communication with NootWEB
-	log.Info("NootWEB responded with: " + string(body))
+	fmt.Println("NootWEB responded with: " + string(body))
 
 	// parse the body of the communication with NootWEB and get the "success" json value
 	var bodyJsonData map[string]interface{}
@@ -239,18 +235,15 @@ func sendMeasurements(co2Val int, tempVal int, humVal int, BoxToken string) {
 	success := bodyJsonData["success"].(bool)
 	if success { // it worked!! (yay :33)
 		// if success, log that the interaction was a success with below statement
-		log.Infof("Sent recorded measurements to NootWEB. Recorded values were CO2: " +
-			string(rune(co2Val)) + ", Temperature: " + string(rune(tempVal)) + ", Humidity: " + string(rune(humVal)) + "." +
-			" BoxToken: " + asteriskExceptLastFive(BoxToken) + ".",
+		fmt.Printf("Sent recorded measurements to NootWEB. Recorded values were CO2: " +
+			string(rune(co2Val)) + ", Temperature: " + string(rune(tempVal)) + ", Humidity: " + string(rune(humVal)) + ". BoxToken: " + asteriskExceptLastFive(BoxToken) + ".\n",
 		)
 	} else { // it didn't work :(
 		// if failed, log that the interaction failed with below statement
-		log.Errorf("Failed to send recorded measurements to NootWEB. REASON: NootWEB replied with \"false\" to the \"success\" JSON variable. ERROR: %s", err)
-		log.Warnf("These measurements will NOT be sent to NootWEB... skipping...")
-
+		fmt.Printf("Failed to send recorded measurements to NootWEB. REASON: NootWEB replied with \"false\" to the \"success\" JSON variable. ERROR: %s\n", err)
+		fmt.Println("These measurements will NOT be sent to NootWEB... skipping...")
 	}
 }
-
 
 // This function is used when you want to create a webserver for the user to enroll their box onto.
 func ginEnrollmentServer() {
@@ -258,9 +251,8 @@ func ginEnrollmentServer() {
 	gws := gin.Default()
 	gws.LoadHTMLGlob("html/*")
 
-
 	// Webserver URL routes go here
-	// TODO: Make this return a HTML file
+	// TODO: Make this return an HTML file
 	gws.GET("/", func(c *gin.Context) {
 		// get the user's language preference
 		prefLang := parseAcceptLanguage(c.GetHeader("Accept-Language"))
@@ -276,7 +268,7 @@ func ginEnrollmentServer() {
 			"message": "Hello! This is the NootBOX enrollment webserver!",
 			"endpoints": gin.H{
 				"Enroll a NootBOX": gin.H{
-					"method": "POST",
+					"method":   "POST",
 					"endpoint": "/api/v1/enroll/",
 				},
 			},
@@ -289,7 +281,7 @@ func ginEnrollmentServer() {
 
 		// write the given code to the "code" variable.
 		if err := c.BindJSON(&code); err != nil {
-			log.Fatalf("Failed to write user-given code to variable. REASON: Unknown. ERROR: %s", err)
+			fmt.Printf("Failed to write user-given code to variable. REASON: Unknown. ERROR: %s\n", err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{
 				"message": "Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: " + err.Error(),
 			})
@@ -297,14 +289,14 @@ func ginEnrollmentServer() {
 		}
 
 		// send a post request to NootWEB, to register this box.
-		postURL := "https://api.noot.site/verify" // the url to send the post req to
-		jsonStr := fmt.Sprintf("{\"code\": \"%d\"}", code) // create a var to hold the JSON we will send
+		postURL := "https://api.noot.site/verify"                                      // the url to send the post req to
+		jsonStr := fmt.Sprintf("{\"code\": \"%d\"}", code)                             // create a var to hold the JSON we will send
 		req, err := http.NewRequest("POST", postURL, bytes.NewBuffer([]byte(jsonStr))) // create the request here.
-		req.Header.Set("Content-Type", "application/json") // tell the server we are sending JSON
-		client := &http.Client{} // initiate http client
-		resp, err := client.Do(req) // send the request we just built
+		req.Header.Set("Content-Type", "application/json")                             // tell the server we are sending JSON
+		client := &http.Client{}                                                       // initiate http client
+		resp, err := client.Do(req)                                                    // send the request we just built
 		if err != nil {
-			log.Errorf("Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: %s", err)
+			fmt.Printf("Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: %s\n", err)
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{
 				"message": "Failed to send box code to NootWEB. REASON: UNKNOWN. ERROR: " + err.Error(),
 			})
@@ -314,7 +306,7 @@ func ginEnrollmentServer() {
 		defer func(Body io.ReadCloser) { // close our connection once data is sent.
 			err := Body.Close()
 			if err != nil {
-				log.Errorf("Failed to send box code to NootWEB. REASON: Couldn't defer 'Body'. ERROR: %s", err)
+				fmt.Printf("Failed to send box code to NootWEB. REASON: Couldn't defer 'Body'. ERROR: %s\n", err)
 				c.IndentedJSON(http.StatusInternalServerError, gin.H{
 					"message": "Failed to send box code to NootWeb. REASON: UNKNOWN. ERROR: " + err.Error(),
 				})
@@ -322,20 +314,19 @@ func ginEnrollmentServer() {
 			}
 		}(resp.Body)
 
-
 		body, _ := io.ReadAll(resp.Body) // body of the communication with NootWEB
-		log.Info("NootWEB responded with: " + string(body))
+		fmt.Println("NootWEB responded with: " + string(body))
 
-		log.Info("Attempting to parse what NootWeb responded with.")
+		fmt.Println("Attempting to parse what NootWeb responded with.")
 		nwStatusCodeOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 		if nwStatusCodeOK { // there is no error in the response (LETS FUCKING GOOOOO :33)
 			// parse and get the BoxID and BoxToken.
 			var nwRespJson map[string]interface{}
 			err = json.Unmarshal([]byte(string(body)), &nwRespJson)
 			if err != nil {
-				log.Errorf("Failed to parse NootWeb response. REASON: UNKNOWN. ERROR: %s", err)
+				fmt.Printf("Failed to parse NootWeb response. REASON: UNKNOWN. ERROR: %s\n", err)
 				c.IndentedJSON(http.StatusInternalServerError, gin.H{
-					"message":  "Failed to parse the NootWeb server's response.",
+					"message": "Failed to parse the NootWeb server's response.",
 				})
 				return
 			}
@@ -343,7 +334,7 @@ func ginEnrollmentServer() {
 			// write these to file
 			NBBoxInfoFile, err := os.OpenFile("boxInfo.noot", os.O_RDWR|os.O_CREATE, 0666)
 			if err != nil {
-				log.Fatalf("Failed to create or open the \"boxInfo.noot\" file. REASON: Unknown. ERROR: %s", err)
+				fmt.Printf("Failed to create or open the \"boxInfo.noot\" file. REASON: Unknown. ERROR: %s\n", err)
 				c.IndentedJSON(http.StatusInternalServerError, gin.H{
 					"message": "Failed to create or open the \"boxInfo.noot\" file. REASON: Unknown. ERROR: " + err.Error(),
 				})
@@ -389,13 +380,12 @@ func ginEnrollmentServer() {
 
 	// run the webserver
 	fmt.Println("Gin webserver running on http://0.0.0.0:17002")
-	err := gws.Run("0.0.0.0:17002") // this runs gws publicly on devices private ip and port 17002
+	err := gws.Run("0.0.0.0:17002") // this runs gws publicly on devices private IP and port 17002
 	if err != nil {
-		log.Fatalf("Failed to start the Gin enrollment webserver. REASON: Webserver startup failed.. ERROR: %s", err)
+		fmt.Printf("Failed to start the Gin enrollment webserver. REASON: Webserver startup failed.. ERROR: %s\n", err)
 		return
 	}
 }
-
 
 func asteriskExceptLastFive(input string) string {
 	// THIS FUNCTION WAS GENERATED USING CHAT-GPT
@@ -413,7 +403,6 @@ func asteriskExceptLastFive(input string) string {
 	return hiddenString
 }
 
-
 // parseAcceptLanguage parses the "Accept-Language" header to get the preferred language.
 func parseAcceptLanguage(acceptLanguage string) string {
 	// THIS FUNCTION WAS GENERATED USING CHAT-GPT
@@ -422,15 +411,15 @@ func parseAcceptLanguage(acceptLanguage string) string {
 
 	// Iterate through the language preferences and extract the language code
 	for _, language := range languages {
-	// Split each preference by semicolon to get the language code and quality
-	parts := strings.Split(strings.TrimSpace(language), ";")
+		// Split each preference by semicolon to get the language code and quality
+		parts := strings.Split(strings.TrimSpace(language), ";")
 
-	// The language code is the first part (e.g., "en-US" in "en-US;q=0.8")
-	languageCode := parts[0]
+		// The language code is the first part (e.g., "en-US" in "en-US;q=0.8")
+		languageCode := parts[0]
 
-	// Remove any additional parameters (e.g., quality) and return the language code
-	return languageCode[:2]
-}
+		// Remove any additional parameters (e.g., quality) and return the language code
+		return languageCode[:2]
+	}
 
 	// Return a default language if no preference is found
 	return "en" // Default to English if no preference is found
@@ -453,52 +442,31 @@ func setupWifi() {
 	adaptor.Configure()
 }
 
-// Wait for user to open serial console
+// Wait for the serial console to become available
 func waitSerial() {
 	for !machine.Serial.DTR() {
 		time.Sleep(100 * time.Millisecond)
 	}
 }
 
-const retriesBeforeFailure = 3
-
-// Connect to access point
+// Connect to a WiFi access point
 func connectToAP() {
-	time.Sleep(2 * time.Second)
-	var err error
-	for i := 0; i < retriesBeforeFailure; i++ {
-		println("Connecting to " + wifiSSID)
-		err = adaptor.ConnectToAccessPoint(wifiSSID, wifiPassword, 10*time.Second)
-		if err == nil {
-			println("Connected.")
-			log.Info("Connected to " + wifiSSID)
+	fmt.Printf("Connecting to %s...\n", wifiSSID)
 
-			return
-		}
+	conn = wifi.Connect(adaptor, wifiSSID, wifiPassword)
+	for conn == nil {
+		fmt.Println("Connection failed. Retrying...")
+		time.Sleep(2 * time.Second)
+		conn = wifi.Connect(adaptor, wifiSSID, wifiPassword)
 	}
-
-	// error connecting to AP
-	failMessage(err.Error())
 }
 
+// Display the device's IP address
 func displayIP() {
-	ip, _, _, err := adaptor.GetIP()
-	for ; err != nil; ip, _, _, err = adaptor.GetIP() {
-		messageWifi(err.Error())
-		time.Sleep(1 * time.Second)
+	ip, err := conn.LocalIP()
+	if err != nil {
+		fmt.Printf("Failed to obtain IP address: %v\n", err)
+		return
 	}
-	messageWifi("IP address: " + ip.String())
-	log.Info("IP address: " + ip.String())
-	fmt.Println("IP address: " + ip.String())
-}
-
-func messageWifi(msg string) {
-	println(msg, "\r")
-}
-
-func failMessage(msg string) {
-	for {
-		println(msg)
-		time.Sleep(1 * time.Second)
-	}
+	fmt.Printf("Connected to WiFi. IP address: %v\n", ip)
 }
