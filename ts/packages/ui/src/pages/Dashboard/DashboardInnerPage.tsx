@@ -109,6 +109,8 @@ export const DashboardInnerPage = (props: DashboardInnerPageProps) => {
     <>
       <DashboardMetricsInnerPage
         uptimeTrackerData={[]}
+        // We know there is only one box from the checks above
+        userBoxesCount={1}
         currentData={{
           co2: {
             value: 400,
