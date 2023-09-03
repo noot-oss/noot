@@ -37,15 +37,19 @@ const retriesBeforeFailureWifi = 3
 // Connect to access point
 func connectToAP(ssid string, pass string, adaptor *wifinina.Device) {
 	time.Sleep(2 * time.Second)
-	var err error
 	for i := 0; i < retriesBeforeFailureWifi; i++ {
 		println("Connecting to " + ssid)
-		err = adaptor.ConnectToAccessPoint(ssid, pass, 10*time.Second)
-		if err == nil {
-			ip, _, _, _ := adaptor.GetIP()
-			println("Connected to " + ssid + ".\nYour IP address is " + ip.String() + ".")
+		err := adaptor.ConnectToAccessPoint(ssid, pass, 10*time.Second)
+		if err != nil {
+			println("Error connecting: " + err.Error())
 			return
 		}
+		ip, _, _, err := adaptor.GetIP()
+		if err != nil {
+			println("Error getting IP address: " + err.Error())
+			return
+		}
+		println("Connected to " + ssid + ".\nYour IP address is " + ip.String() + ".")
 	}
 
 	// error connecting to AP

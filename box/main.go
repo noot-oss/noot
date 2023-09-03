@@ -7,7 +7,7 @@ import (
 	"machine"
 	"os"
 	"time"
-	i2c "tinygo.org/x/drivers/i2csoft" // Tinygo I2C driver.
+	// i2c "tinygo.org/x/drivers/i2csoft" // Tinygo I2C driver.
 	"tinygo.org/x/drivers/net"         // Tinygo networking drivers.
 	"tinygo.org/x/drivers/net/http"    // Tinygo only module for interaction with internet.
 	"tinygo.org/x/drivers/scd4x"
@@ -22,6 +22,7 @@ import (
 // TODO: CHANGE GIN TO https://github.com/tinygo-org/drivers/blob/v0.25.0/examples/wifinina/webserver/main.go
 // TODO: HASH THE STORED BOXTOKEN, SO IT ISN'T STORED IN PLAINTEXT.
 // TODO: DETECT IF RUNNING ON x64_86 OR ARM.
+// TODO: REMOVE EVERYTHING THAT IS UNUSED.
 
 
 // IMPORTANT VARIABLES USED THROUGHOUT THIS CODE
@@ -33,9 +34,6 @@ var wifiPassword string           // Password of the Wi-Fi network
 var wifiAdaptor *wifinina.Device  // Wi-Fi connection
 var scd *scd4x.Device             // SCD4X sensor
 var buf [0x400]byte               // Buffer for HTTP requests and responses.
-var lastRequestTime time.Time     // Time of the last request
-var conn net.Conn 			      // TCP connection to the server
-var spi = machine.NINA_SPI		  // SPI bus
 
 
 func main() {
@@ -72,11 +70,14 @@ func main() {
 	println("Device initialized!")
 	println("Attempting to connect to the internet...")
 	// Connect to the internet with Wi-Fi.
-	setupWifi(wifiAdaptor)
-	http.SetBuf(buf[:])
-	waitSerialWifi()
-	connectToAP(wifiSSID, wifiPassword, wifiAdaptor)
-	displayIP(wifiAdaptor)
+	if wifiSSID == "" {
+		setupWifi(wifiAdaptor)
+		// http.SetBuf(buf[:])
+		waitSerialWifi()
+		connectToAP(wifiSSID, wifiPassword, wifiAdaptor)
+		displayIP(wifiAdaptor)
+	}
+
 
 	// TODO: WRITE TO EEPROM, NOT FILE.
 	// Check if already a nootbox
