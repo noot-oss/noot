@@ -40,7 +40,7 @@ var spi = machine.NINA_SPI		  // SPI bus
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.2.5.1"
+	VERSION := "V0.2.5.2"
 
 	// TODO: LOGGING TO FILE.
 	// initiate the logging
@@ -331,11 +331,11 @@ func broadcastDataLoop(BoxToken string) {
 //		}
 //	})
 
-	// run the webserver
-	println("Gin webserver running on http://0.0.0.0:17002")
-	err := gws.Run("0.0.0.0:17002") // this runs gws publicly on devices private IP and port 17002
-	if err != nil {
-		fmt.Printf("Failed to start the Gin enrollment webserver. REASON: Webserver startup failed.. ERROR: %s\n", err)
-		return
-	}
-}
+	// Run the webserver
+//	println("Gin webserver running on http://0.0.0.0:17002")
+//	err := gws.Run("0.0.0.0:17002") // this runs gws publicly on devices private IP and port 17002
+//	if err != nil {
+//		fmt.Printf("Failed to start the Gin enrollment webserver. REASON: Webserver startup failed.. ERROR: %s\n", err)
+//		return
+//	}
+//}
