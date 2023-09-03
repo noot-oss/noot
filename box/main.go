@@ -2,16 +2,11 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"io"
 	"machine"
 	"os"
-	"strings"
 	"time"
-	"tinygo.org/x/drivers/i2c"
 	"tinygo.org/x/drivers/net"      // Tinygo networking drivers.
 	"tinygo.org/x/drivers/net/http" // Tinygo only module for interaction with internet.
 	"tinygo.org/x/drivers/scd4x"
@@ -45,7 +40,7 @@ var spi = machine.NINA_SPI		  // SPI bus
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.2.5"
+	VERSION := "V0.2.5.1"
 
 	// TODO: LOGGING TO FILE.
 	// initiate the logging

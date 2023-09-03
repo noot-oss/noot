@@ -21,6 +21,7 @@ func enrollServerMain(spi machine.NINA_SPI, adaptor *wifinina.Device) error {
 
 func root(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+	// TODO: EDIT BELOW MESSAGE.
 	_, err := fmt.Fprint(w, `
 <html>
 	<head>
@@ -38,6 +39,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 }
 
 func enroll(w http.ResponseWriter, r *http.Request) {
+	// TODO: FINISH THIS ENDPOINT.
 	err := r.ParseForm()
 	if err != nil {
 		println("Error parsing form: " + err.Error())
