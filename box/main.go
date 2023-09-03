@@ -40,7 +40,7 @@ var spi = machine.NINA_SPI		  // SPI bus
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.2.5.2"
+	VERSION := "V0.2.5.3"
 
 	// TODO: LOGGING TO FILE.
 	// initiate the logging

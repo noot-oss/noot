@@ -42,7 +42,7 @@ func connectToAP(ssid string, pass string, adaptor *wifinina.Device) {
 		err = adaptor.ConnectToAccessPoint(ssid, pass, 10*time.Second)
 		if err == nil {
 			ip, _, _, _ := adaptor.GetIP()
-			println("Connected to " + ssid + ".\nYour IP address is " + ip.String() + "."))
+			println("Connected to " + ssid + ".\nYour IP address is " + ip.String() + ".")
 			return
 		}
 	}
