@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"tinygo.org/x/drivers/net/http"
 	"tinygo.org/x/drivers/wifinina"
 	"machine"
 )
 
 
-func enrollServerMain(spi machine.NINA_SPI, adaptor *wifinina.Device) error {
+func enrollServerMain(adaptor *wifinina.Device) error {
 	http.UseDriver(adaptor)
 
 	http.HandleFunc("/", root)
@@ -61,7 +60,7 @@ func enroll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set(`Content-Type`, `application/json`)
-	_, err = fmt.Fprintf(w, `{"cnt": %d}`, counter)
+	_, err = fmt.Fprintf(w, `{"msg": "Hello, World!"}`)
 	if err != nil {
 		println("Error writing response: " + err.Error())
 		return

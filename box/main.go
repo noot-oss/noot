@@ -7,11 +7,11 @@ import (
 	"machine"
 	"os"
 	"time"
-	"tinygo.org/x/drivers/net"      // Tinygo networking drivers.
-	"tinygo.org/x/drivers/net/http" // Tinygo only module for interaction with internet.
+	i2c "tinygo.org/x/drivers/i2csoft" // Tinygo I2C driver.
+	"tinygo.org/x/drivers/net"         // Tinygo networking drivers.
+	"tinygo.org/x/drivers/net/http"    // Tinygo only module for interaction with internet.
 	"tinygo.org/x/drivers/scd4x"
-	"tinygo.org/x/drivers/wifinina" // Tinygo internet driver interaction.
-
+	"tinygo.org/x/drivers/wifinina"    // Tinygo internet driver interaction.
 )
 
 // TODO: SPLIT PROJECT INTO MULTIPLE FILES.
@@ -40,7 +40,7 @@ var spi = machine.NINA_SPI		  // SPI bus
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.2.5.3"
+	VERSION := "V0.2.5.5"
 
 	// TODO: LOGGING TO FILE.
 	// initiate the logging
@@ -58,9 +58,7 @@ func main() {
 	println("Starting up...")
 	println("Initializing the device...")
 	machine.InitADC()
-	machine.InitPWM()
-	machine.InitUART()
-	machine.InitSPI()
+
 	println("Initializing the SCD4X sensor...")
 	// Initialize I2C // The below code using "machine" ALWAYS throws errors under amd64, however it works fine on ARM.
 	i2cPort := machine.I2C0
@@ -74,7 +72,7 @@ func main() {
 	println("Device initialized!")
 	println("Attempting to connect to the internet...")
 	// Connect to the internet with Wi-Fi.
-	setupWifi(spi, wifiAdaptor)
+	setupWifi(wifiAdaptor)
 	http.SetBuf(buf[:])
 	waitSerialWifi()
 	connectToAP(wifiSSID, wifiPassword, wifiAdaptor)
@@ -133,7 +131,7 @@ func main() {
 	if BoxID == "0" { // if the boxID didn't exist:
 		println("This NootBOX does not seem to be enrolled.")
 		println("Starting the enrollment webserver.")
-		err := enrollServerMain(spi, wifiAdaptor)
+		err := enrollServerMain(wifiAdaptor)
 		if err != nil {
 			println("Failed to start the enrollment webserver: " + err.Error())
 			return

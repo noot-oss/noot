@@ -7,8 +7,9 @@ import (
 )
 
 
-func setupWifi(spi machine.NINA_SPI, adaptor *wifinina.Device) {
+func setupWifi(adaptor *wifinina.Device) {
 	// Configure SPI for 8Mhz, Mode 0, MSB First
+	spi := machine.NINA_SPI
 	spi.Configure(machine.SPIConfig{
 		Frequency: 8 * 1e6,
 		SDO:       machine.NINA_SDO,
