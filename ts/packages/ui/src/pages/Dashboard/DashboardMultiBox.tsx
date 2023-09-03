@@ -41,7 +41,7 @@ export const DashboardMultiBox = (props: { userBoxes: Box[] }) => {
           <Link href="/create">Create box</Link>
         </Button>
       </div>
-      <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
         {props.userBoxes.map((box) => (
           <li key={box.id}>
             <DashboardBox box={box} />

@@ -23,10 +23,6 @@ const CreateBoxPage = () => {
     }
   );
 
-  const refetchData = () => {
-    setHasRefetched(true);
-  };
-
   const errorToDisplay = hasRefetched
     ? foundBoxes.isError
       ? "too-many-requests"
@@ -38,6 +34,8 @@ const CreateBoxPage = () => {
       <CreateInnerPage
         code={userCode.data ? userCode.data.verificationCode : undefined}
         handleContinue={() => {
+          setHasRefetched(true);
+          if (foundBoxes.isError) return;
           if (foundBoxes.data.length > 0) {
             router.push(`/box/${foundBoxes.data[0].id}`);
           }

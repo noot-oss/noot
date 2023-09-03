@@ -28,7 +28,7 @@ const StepTitle = (props: { children: React.ReactNode }) => (
 export const SkeletonLoading = () => (
   <div className="flex flex-col gap-8">
     <Skeleton className="h-16 w-full sm:w-[20rem]" />
-    <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+    <ul className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: 2 }).map((box, index) => (
         <li key={`skeleton-${index}`}>
           <Skeleton className="flex h-full flex-col p-6">
