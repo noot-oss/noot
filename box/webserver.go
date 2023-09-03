@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"tinygo.org/x/drivers/net/http"
 	"tinygo.org/x/drivers/wifinina"
-	"machine"
 )
-
 
 func enrollServerMain(adaptor *wifinina.Device) error {
 	http.UseDriver(adaptor)
@@ -16,7 +14,6 @@ func enrollServerMain(adaptor *wifinina.Device) error {
 
 	return http.ListenAndServe(":17002", nil)
 }
-
 
 func root(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
@@ -45,7 +42,6 @@ func enroll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "POST" {
-
 
 	} else { // Method was not POST.
 		// Change status code

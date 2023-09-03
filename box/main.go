@@ -7,11 +7,9 @@ import (
 	"machine"
 	"os"
 	"time"
-	// i2c "tinygo.org/x/drivers/i2csoft" // Tinygo I2C driver.
-	"tinygo.org/x/drivers/net"         // Tinygo networking drivers.
-	"tinygo.org/x/drivers/net/http"    // Tinygo only module for interaction with internet.
+
 	"tinygo.org/x/drivers/scd4x"
-	"tinygo.org/x/drivers/wifinina"    // Tinygo internet driver interaction.
+	"tinygo.org/x/drivers/wifinina" // Tinygo internet driver interaction.
 )
 
 // TODO: SPLIT PROJECT INTO MULTIPLE FILES.
@@ -24,21 +22,76 @@ import (
 // TODO: DETECT IF RUNNING ON x64_86 OR ARM.
 // TODO: REMOVE EVERYTHING THAT IS UNUSED.
 
-
 // IMPORTANT VARIABLES USED THROUGHOUT THIS CODE
 
-var BoxID string                  // ID of the box
-var BoxToken string 	          // Token of the box
-var wifiSSID string               // Name of the Wi-Fi network
-var wifiPassword string           // Password of the Wi-Fi network
-var wifiAdaptor *wifinina.Device  // Wi-Fi connection
-var scd *scd4x.Device             // SCD4X sensor
-var buf [0x400]byte               // Buffer for HTTP requests and responses.
+var BoxID string        // ID of the box
+var BoxToken string     // Token of the box
+var wifiSSID string     // Name of the Wi-Fi network
+var wifiPassword string // Password of the Wi-Fi network
+var scd *scd4x.Device   // SCD4X sensor
+var buf [0x400]byte     // Buffer for HTTP requests and responses.
+var (
+	i2c    = machine.I2C0
+	sensor = scd4x.New(i2c)
+)
 
+var (
+
+	// these are the default pins for the Arduino Nano33 IoT.
+	spi = machine.NINA_SPI
+
+	// this is the ESP chip that has the WIFININA firmware flashed on it
+	adaptor *wifinina.Device
+)
+
+func setup() {
+
+	// Configure SPI for 8Mhz, Mode 0, MSB First
+	spi.Configure(machine.SPIConfig{
+		Frequency: 8 * 1e6,
+		SDO:       machine.NINA_SDO,
+		SDI:       machine.NINA_SDI,
+		SCK:       machine.NINA_SCK,
+	})
+
+	adaptor = wifinina.New(spi,
+		machine.NINA_CS,
+		machine.NINA_ACK,
+		machine.NINA_GPIO0,
+		machine.NINA_RESETN)
+	adaptor.Configure()
+}
+
+func failMessage(msg string) {
+	for {
+		println(msg)
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func connectToAP() {
+	time.Sleep(2 * time.Second)
+	var err error
+	for i := 0; i < retriesBeforeFailureWifi; i++ {
+		println("Connecting to " + wifiSSID)
+		err = adaptor.ConnectToAccessPoint(wifiSSID, wifiPassword, 10*time.Second)
+		if err == nil {
+			println("Connected.")
+
+			return
+		}
+	}
+
+	// error connecting to AP
+	failMessage(err.Error())
+}
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
 	VERSION := "V0.2.5.6"
+
+	setup()
+	waitSerialWifi()
 
 	// TODO: LOGGING TO FILE.
 	// initiate the logging
@@ -58,26 +111,18 @@ func main() {
 	machine.InitADC()
 
 	println("Initializing the SCD4X sensor...")
-	// Initialize I2C // The below code using "machine" ALWAYS throws errors under amd64, however it works fine on ARM.
-	i2cPort := machine.I2C0
 	// i2cPort.Configure(i2c.I2CConfig{Frequency: 400000, SDA: machine., SCL: machine.SCL})})
-	scd = scd4x.New(i2cPort)  // create new sensor
-	if err := scd.Configure(); err != nil {  // reset sensor.
-		println("Failed to configure SCD4x: ", err)  // whoopsie, we did a fucky wucky :33
-		return
-	}
+	//i2c.Configure(machine.I2CConfig{})
+	//if err := sensor.Configure(); err != nil { // reset sensor.
+	//	println("Failed to configure SCD4x: ", err) // whoopsie, we did a fucky wucky :33
+	//	return
+	//}
 
 	println("Device initialized!")
 	println("Attempting to connect to the internet...")
 	// Connect to the internet with Wi-Fi.
-	if wifiSSID == "" {
-		setupWifi(wifiAdaptor)
-		// http.SetBuf(buf[:])
-		waitSerialWifi()
-		connectToAP(wifiSSID, wifiPassword, wifiAdaptor)
-		displayIP(wifiAdaptor)
-	}
-
+	// http.SetBuf(buf[:])
+	connectToAP()
 
 	// TODO: WRITE TO EEPROM, NOT FILE.
 	// Check if already a nootbox
@@ -92,7 +137,7 @@ func main() {
 		var fileData string                    // var for file content
 		scanner := bufio.NewScanner(BoxIDFile) // read first line of the file
 		for scanner.Scan() {
-			println(scanner.Text()) // DEBUG: print the line from file
+			println(scanner.Text())   // DEBUG: print the line from file
 			fileData = scanner.Text() // pull the BoxID
 		}
 
@@ -132,7 +177,7 @@ func main() {
 	if BoxID == "0" { // if the boxID didn't exist:
 		println("This NootBOX does not seem to be enrolled.")
 		println("Starting the enrollment webserver.")
-		err := enrollServerMain(wifiAdaptor)
+		err := enrollServerMain(adaptor)
 		if err != nil {
 			println("Failed to start the enrollment webserver: " + err.Error())
 			return
@@ -146,7 +191,6 @@ func main() {
 	}
 
 }
-
 
 // TODO: Power optimise this at some point (maybe) (probably not) (but maybe) БЛЯТЬ!!!!!!!!!!!
 func broadcastDataLoop(BoxToken string) {
@@ -180,11 +224,20 @@ func broadcastDataLoop(BoxToken string) {
 
 		// Read the recorded values
 		co2Val, err := scd.ReadCO2()
-		if err != nil {println("Failed to read measurement: ", err);return}
+		if err != nil {
+			println("Failed to read measurement: ", err)
+			return
+		}
 		tempVal := scd.ReadTempC()
-		if err != nil {println("Failed to read measurement: ", err);return}
+		if err != nil {
+			println("Failed to read measurement: ", err)
+			return
+		}
 		humVal, err := scd.ReadHumidity()
-		if err != nil {println("Failed to read measurement: ", err);return}
+		if err != nil {
+			println("Failed to read measurement: ", err)
+			return
+		}
 
 		// Stop continuous measurement
 		if err := scd.StopPeriodicMeasurement(); err != nil {
@@ -193,7 +246,7 @@ func broadcastDataLoop(BoxToken string) {
 		}
 
 		// send data to noot nya~~
-		sendMeasurements(co2Val,tempVal, humVal, BoxToken)
+		sendMeasurements(co2Val, tempVal, humVal, BoxToken)
 	}
 }
 
@@ -330,7 +383,7 @@ func broadcastDataLoop(BoxToken string) {
 //		}
 //	})
 
-	// Run the webserver
+// Run the webserver
 //	println("Gin webserver running on http://0.0.0.0:17002")
 //	err := gws.Run("0.0.0.0:17002") // this runs gws publicly on devices private IP and port 17002
 //	if err != nil {
