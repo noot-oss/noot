@@ -1,12 +1,16 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { Button } from "@noot/ui/src/components/Button";
 import { Home as HomeComponent } from "@noot/ui/src/pages/Home/Home";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const session = useSession();
+  const router = useRouter();
+
+  if (session.data?.user) {
+    router.replace("/dashboard");
+  }
 
   return <HomeComponent />;
 }
