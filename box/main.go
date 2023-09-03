@@ -40,7 +40,7 @@ var spi = machine.NINA_SPI		  // SPI bus
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.2.5.5"
+	VERSION := "V0.2.5.6"
 
 	// TODO: LOGGING TO FILE.
 	// initiate the logging
@@ -62,7 +62,7 @@ func main() {
 	println("Initializing the SCD4X sensor...")
 	// Initialize I2C // The below code using "machine" ALWAYS throws errors under amd64, however it works fine on ARM.
 	i2cPort := machine.I2C0
-	i2cPort.Configure(i2c.Config{Frequency: i2c.Frequency400kHz})
+	// i2cPort.Configure(i2c.I2CConfig{Frequency: 400000, SDA: machine., SCL: machine.SCL})})
 	scd = scd4x.New(i2cPort)  // create new sensor
 	if err := scd.Configure(); err != nil {  // reset sensor.
 		println("Failed to configure SCD4x: ", err)  // whoopsie, we did a fucky wucky :33
