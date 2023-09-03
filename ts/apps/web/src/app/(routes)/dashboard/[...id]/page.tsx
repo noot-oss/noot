@@ -23,6 +23,12 @@ const DashboardOwnPage = async ({
     },
   });
 
+  const userBoxesCount = await prisma.box.count({
+    where: {
+      ownerId: user.user.id,
+    },
+  });
+
   if (!userBox) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-8">
@@ -56,6 +62,7 @@ const DashboardOwnPage = async ({
       boxData={{
         name: userBox.name,
       }}
+      userBoxesCount={userBoxesCount}
     />
   );
 };

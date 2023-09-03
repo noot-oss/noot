@@ -38,6 +38,7 @@ export interface MetricsProps {
   uptimeTrackerData: UptimeTrackerData[];
   currentData: CurrentData;
   boxData: BoxData;
+  userBoxesCount: number;
 }
 
 const NumberMetricCard = (props: {
@@ -91,13 +92,15 @@ const AlertsCard = () => (
 export const DashboardMetricsInnerPage = (props: MetricsProps) => {
   return (
     <div className="flex h-full flex-col">
-      <Link
-        href={"/dashboard"}
-        className="mb-4 flex w-fit flex-row items-center text-white text-opacity-50 transition-colors hover:text-opacity-100"
-      >
-        <ArrowLongLeftIcon className="mr-2 h-6 w-6" />
-        <span>Back to dashboard</span>
-      </Link>
+      {props.userBoxesCount > 1 && (
+        <Link
+          href={"/dashboard"}
+          className="mb-4 flex w-fit flex-row items-center text-white text-opacity-50 transition-colors hover:text-opacity-100"
+        >
+          <ArrowLongLeftIcon className="mr-2 h-6 w-6" />
+          <span>Back to dashboard</span>
+        </Link>
+      )}
       <H1 className="mb-8">{props.boxData.name}</H1>
 
       <Grid numItemsSm={1} numItemsLg={4} className={"h-fit gap-8"}>

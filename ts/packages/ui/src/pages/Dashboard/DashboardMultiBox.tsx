@@ -14,7 +14,11 @@ const DashboardBox = ({ box }: { box: Box }) => {
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle className="text-3xl">{box.name}</CardTitle>
+        <CardTitle className="text-3xl">
+          <Link href={`/dashboard/${box.id}`} className="hover:underline">
+            {box.name}
+          </Link>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p>{box.description}</p>

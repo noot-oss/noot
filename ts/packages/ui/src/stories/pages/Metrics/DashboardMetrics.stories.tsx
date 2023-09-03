@@ -8,6 +8,7 @@ export const DashboardMetricsStory = () => (
       uptimeTrackerData={mockTrackerData}
       currentData={mockCurrentData}
       boxData={mockBoxData}
+      userBoxesCount={2}
     />
   </PageWrapper>
 );
