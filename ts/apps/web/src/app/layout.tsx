@@ -13,7 +13,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <Script
           async
           src="https://analytics.umami.is/script.js"
-          data-website-id={env.}
+          data-website-id={env.NEXT_PUBLIC_UMAMI_CODE}
         />
       )}
 
