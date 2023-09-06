@@ -11,13 +11,12 @@ import (
 // TODO: Make a function to send warnings/alerts to NootWeb
 func sendAlert() {}
 
-
 func sendMeasurements(co2Val int32, tempVal float32, humVal int32, BoxToken string) {
 	// send a post request to NootWEB, that will submit the recorded data.
 	println("Attempting to send recorded measurements to NootWEB...")
 	postURL := "https://api.noot.site/push" // the url to send the post req to
 	jsonStr := fmt.Sprintf(
-		"{\"co2\": %d, \"temp\":%d, \"humidity\": %d, \"token\": \"%s\"}",
+		"{\"co2\": %d, \"temp\":%f, \"humidity\": %d, \"token\": \"%s\"}",
 		co2Val, tempVal, humVal, BoxToken,
 	) // create a var to hold the JSON we will send
 	req, err := http.Post(postURL, "application/json", bytes.NewBuffer([]byte(jsonStr)))
