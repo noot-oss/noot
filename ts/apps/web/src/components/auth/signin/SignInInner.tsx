@@ -29,7 +29,8 @@ export const SignInInner = () => {
 
   if (session.data) router.push("/");
 
-  if (!providers) return <div>Providers not found</div>;
+  if (!providers) return <div>Loading login providers...</div>; // If this keeps saying this, and doesn't load providers, it means it cant actually find them.
+  // I changed this cus it kept saying it for a short amount of time when clicking "sign in", and THEN loading providers. --ac.
 
   return (
     <div className="mx-4 flex w-full flex-col gap-8 px-8 py-16 text-center sm:mx-0 sm:max-w-xs md:max-w-md md:px-32 lg:max-w-2xl">
