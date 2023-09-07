@@ -1,4 +1,4 @@
-import { H2 } from "~ui/components/Typography";
+import { H2 } from "@noot/ui/src/components/Typography";
 import { useState } from "react";
 import { Chevron } from "./Chevron";
 
