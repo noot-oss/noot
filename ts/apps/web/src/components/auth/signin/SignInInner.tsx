@@ -24,7 +24,7 @@ export const SignInInner = () => {
   }, []);
 
   if (!providers) {
-    return <div>Providers not found</div>;
+    return <div>Loading login providers</div>;
   }
 
   if (session.data) router.push("/");
