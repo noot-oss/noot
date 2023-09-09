@@ -25,3 +25,6 @@ NootBOX_logfile.log
 
 node_modules
 boxInfo.noot
+
+# tinygo binary (i think...??)
+*.elf
