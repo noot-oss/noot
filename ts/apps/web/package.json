@@ -53,5 +53,10 @@
   },
   "ct3aMetadata": {
     "initVersion": "7.16.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@babel/core": "7.22.17"
+    }
   }
 }

@@ -14,5 +14,10 @@
     "turbo": "latest"
   },
   "packageManager": "pnpm@8.6.10",
-  "name": "ts"
+  "name": "ts",
+  "pnpm": {
+    "overrides": {
+      "@babel/core": "7.22.17"
+    }
+  }
 }
