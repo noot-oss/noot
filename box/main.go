@@ -4,23 +4,23 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"machine"
+	"machine" // This errors on ALL PLATFORMS. You can ignore it. This is due to tinygo not supporting the "machine" package on non-microcontroller platforms.
 	"os"
 	"time"
 
-	"tinygo.org/x/drivers/scd4x"
+	"tinygo.org/x/drivers/scd4x"    // Tinygo driver for the SCD4X sensor.
 	"tinygo.org/x/drivers/wifinina" // Tinygo internet driver interaction.
 )
 
-// TODO: SPLIT PROJECT INTO MULTIPLE FILES.
+// TODO: COMPLETELY CHANGE ALL LOGGING TO HAVE BETTER SYNTAX, TO EASILY UNDERSTAND WHAT IS SENDING WHAT.
 // TODO: CORRECT ALL ERROR MESSAGES TO BE MORE SIMPLISTIC AND EASY TO UNDERSTAND.
 // TODO: WHERE NECESSARY, SEND ALERTS TO NOOTWEB.
 // TODO: MAKE SCRIPT STORE IMPORTANT VALUES IN EEPROM.
-// TODO: CHANGE LOGRUS TO "LOG" PACKAGE.
 // TODO: CHANGE GIN TO https://github.com/tinygo-org/drivers/blob/v0.25.0/examples/wifinina/webserver/main.go
 // TODO: HASH THE STORED BOXTOKEN, SO IT ISN'T STORED IN PLAINTEXT.
 // TODO: DETECT IF RUNNING ON x64_86 OR ARM.
-// TODO: REMOVE EVERYTHING THAT IS UNUSED.
+// TODO: REMOVE EVERYTHING THAT IS UNUSED (After through testing).
+// TODO: Add average noise level measurement.
 
 // IMPORTANT VARIABLES USED THROUGHOUT THIS CODE
 
@@ -29,22 +29,11 @@ var BoxToken string     // Token of the box
 var wifiSSID string     // Name of the Wi-Fi network
 var wifiPassword string // Password of the Wi-Fi network
 var scd *scd4x.Device   // SCD4X sensor
-var buf [0x400]byte     // Buffer for HTTP requests and responses.
-var (
-	i2c    = machine.I2C0
-	sensor = scd4x.New(i2c)
-)
 
-var (
+var spi = machine.NINA_SPI   // These are the default pins for the Arduino Nano33 IoT.
+var adaptor *wifinina.Device // This is the ESP chip that has the WIFININA firmware flashed on it
 
-	// these are the default pins for the Arduino Nano33 IoT.
-	spi = machine.NINA_SPI
-
-	// this is the ESP chip that has the WIFININA firmware flashed on it
-	adaptor *wifinina.Device
-)
-
-func setup() {
+func setupWifi() {
 
 	// Configure SPI for 8Mhz, Mode 0, MSB First
 	spi.Configure(machine.SPIConfig{
@@ -62,7 +51,8 @@ func setup() {
 	adaptor.Configure()
 }
 
-func failMessage(msg string) {
+// Modules for Wi-Fi setup
+func failMessageWifi(msg string) {
 	for {
 		println(msg)
 		time.Sleep(1 * time.Second)
@@ -72,28 +62,46 @@ func failMessage(msg string) {
 func connectToAP() {
 	time.Sleep(2 * time.Second)
 	var err error
+	retriesBeforeFailureWifi := 3
 	for i := 0; i < retriesBeforeFailureWifi; i++ {
 		println("Connecting to " + wifiSSID)
 		err = adaptor.ConnectToAccessPoint(wifiSSID, wifiPassword, 10*time.Second)
 		if err == nil {
 			println("Connected.")
-
 			return
 		}
 	}
-
 	// error connecting to AP
-	failMessage(err.Error())
+	failMessageWifi(err.Error())
 }
 
 func main() {
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.2.5.6"
+	VERSION := "V0.2.8"
+	println("Application start at " + time.Now().String() + ".")
+	println("Waiting 3 seconds...")
+	time.Sleep(3 * time.Second)
 
-	setup()
+	// TODO: DEBUG
+	println("for loop goes: \n1: write, 2: read, 3: erase")
+	for {
+		writeAllStorage("This is test: " + time.Now().String())
+		println(readAllStorage())
+		eraseAllBlocks()
+		println(readAllStorage())
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	println("FLSH:  Storage information: ")
+	storageInfo()
+
+	println("WIFI:  Initialising the Wi-Fi module...")
+	println("WIFI:  >Setting up the Wi-Fi module...")
+	setupWifi()
+	println("WIFI:  >>Waiting for serial connection...")
 	waitSerialWifi()
 
-	// TODO: LOGGING TO FILE.
+	// TODO: LOGGING TO FILE/NOOTWEB
 	// initiate the logging
 	//logFile, err := os.OpenFile("NootBOX_logfile.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	//if err != nil {
@@ -101,16 +109,17 @@ func main() {
 	//	return
 	//}
 
-	println("==========================================================================")
-	println("NootBOX application has started.")
-	println("Logging initiated!")
+	println("The NootBox application has started.")
 
 	println("This is NootBOX, Version %s.\n", VERSION)
 	println("Starting up...")
 	println("Initializing the device...")
 	machine.InitADC()
 
-	println("Initializing the SCD4X sensor...")
+	// println("Initializing the SCD4X sensor...")
+
+	//TODO: see if this commented code is necessary, delete after testing.
+	//
 	// i2cPort.Configure(i2c.I2CConfig{Frequency: 400000, SDA: machine., SCL: machine.SCL})})
 	//i2c.Configure(machine.I2CConfig{})
 	//if err := sensor.Configure(); err != nil { // reset sensor.
@@ -118,18 +127,40 @@ func main() {
 	//	return
 	//}
 
-	println("Device initialized!")
 	println("Attempting to connect to the internet...")
 	// Connect to the internet with Wi-Fi.
-	// http.SetBuf(buf[:])
-	connectToAP()
+	// TODO: PULL CREDS FROM STORAGE HERE. IF NONE, USE THE VALUES CURRENTLY IN THE VARIABLES.
+	// pulling all of storage
+	storedData := readAllStorage()
+	if storedData == "" { // TODO: change to what an empty value would be
+		// if empty, use the values from current variables
+		println("WIFI:  >>>Connecting to \"" + wifiSSID + "\"...")
+		connectToAP()
+		println("WIFI:  >>>>Displaying IP address...")
+		displayIP(adaptor)
+	} else {
+		// not empty, use these variables.
+		// parse the data to get ssid and password
+		// TODO: find what the data will look like and parse it.
 
-	// TODO: WRITE TO EEPROM, NOT FILE.
+		wifiSSID = ""
+		wifiPassword = ""
+
+		// connect
+		println("WIFI:  >>>Connecting to \"" + wifiSSID + "\"...")
+		connectToAP()
+
+		println("WIFI:  >>>>Displaying IP address...")
+		displayIP(adaptor)
+	}
+
+	// TODO: Change this to use the correct method of reading data.
 	// Check if already a nootbox
-	println("Checking if \"boxInfo.noot\" file already exists.")
+	println("Checking if box information already exists...")
+
 	// Check if we have a BoxID stored.
-	BoxIDFile, err := os.Open("boxInfo.noot") // Likely only work on linux/microcontrollers.
-	if err != nil {                           // if the file doesn't exist or won't open for some reason, assume un-enrolled.
+	BoxIDFile, err := os.Open("boxInfo.noot")
+	if err != nil { // if the file doesn't exist or won't open for some reason, assume un-enrolled.
 		println("Failed to open the Box ID storage file, Assuming BoxID = \"0\". REASON: Unknown. ERROR: %s\n", err)
 		BoxID = "0"
 	} else {

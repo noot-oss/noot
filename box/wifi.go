@@ -13,8 +13,6 @@ func waitSerialWifi() {
 	}
 }
 
-const retriesBeforeFailureWifi = 3
-
 func displayIP(adaptor *wifinina.Device) {
 	ip, _, _, err := adaptor.GetIP()
 	for ; err != nil; ip, _, _, err = adaptor.GetIP() {
@@ -26,11 +24,4 @@ func displayIP(adaptor *wifinina.Device) {
 
 func wifiMessage(msg string) {
 	println(msg, "\r")
-}
-
-func failMessageWifi(msg string) {
-	for {
-		println(msg)
-		time.Sleep(1 * time.Second)
-	}
 }
