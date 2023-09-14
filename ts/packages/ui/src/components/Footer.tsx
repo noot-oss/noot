@@ -15,11 +15,10 @@ export const FooterInner = (
   return (
     <footer className="flex min-h-[4rem] w-full flex-col items-center justify-center gap-2 border-t px-4 sm:flex-row sm:justify-between lg:gap-0 lg:px-16">
       <span>
-        Currently running in {PRODUCTION ? "production" : "development"} mode
-      </span>
-      {PRODUCTION && (
-        <span>Version: {props.NEXT_PUBLIC_GITHUB_SHA.substring(0, 7)}</span>
+        NWVersion: {PRODUCTION ? "PROD" : "DEVELOPMENT"}{PRODUCTION && (
+          <span>{props.NEXT_PUBLIC_GITHUB_SHA.substring(0, 7)}</span>
       )}
+      </span>
     </footer>
   );
 };
