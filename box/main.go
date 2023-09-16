@@ -76,6 +76,8 @@ func connectToAP() {
 }
 
 func main() {
+	println("WIFI:  >>Waiting for serial connection...")
+	waitSerialWifi()
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
 	VERSION := "V0.2.8"
 	println("Application start at " + time.Now().String() + ".")
@@ -98,8 +100,6 @@ func main() {
 	println("WIFI:  Initialising the Wi-Fi module...")
 	println("WIFI:  >Setting up the Wi-Fi module...")
 	setupWifi()
-	println("WIFI:  >>Waiting for serial connection...")
-	waitSerialWifi()
 
 	// TODO: LOGGING TO FILE/NOOTWEB
 	// initiate the logging

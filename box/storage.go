@@ -25,7 +25,9 @@ func readAllStorage() string {
 
 	// Read flash contents into a byte slice of the appropriate size
 	println(">>Reading flash contents...")
-	readData := make([]byte, flashSize)
+	// TODO: fix - broken
+	readData := make([]byte(flashSize))
+	println("Read data!!")
 	err := reFl(readData, 0)
 	println(">>>Verifying storage integrity...")
 	checkErrorStorage(err)
