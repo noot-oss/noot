@@ -84,7 +84,6 @@ func main() {
 	println("Waiting 3 seconds...")
 	time.Sleep(3 * time.Second)
 
-	// TODO: DEBUG
 	println("for loop goes: \n1: write, 2: read, 3: erase")
 	for {
 		writeAllStorage("This is test: " + time.Now().String())
