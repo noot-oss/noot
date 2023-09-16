@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const (
+	flashBlockSize = 4096 // Set a reasonable block size based on your flash memory
+)
+
 // This prints a fuckton of info about storage to terminal or wherever the fuck println goes
 func storageInfo() {
 	println("Flash data start:       ", machine.FlashDataStart())
@@ -25,10 +29,24 @@ func readAllStorage() string {
 
 	// Read flash contents into a byte slice of the appropriate size
 	println(">>Reading flash contents...")
-	// TODO: fix - broken
-	readData := make([]byte(flashSize))
-	println("Read data!!")
+
+	// used chatgpt, I hope this shit works
+	readData := make([]byte, 0) // Initialize an empty byte slice
+	for offset := int64(0); offset < flashSize; offset += flashBlockSize {
+		// Read a chunk of data
+		chunkSize := min(flashBlockSize, flashSize-offset)
+		chunk := make([]byte, chunkSize)
+		err := readFlash(chunk, offset)
+		if err != nil {
+			checkError(err)
+			break
+		}
+		// Append the chunk to the readData slice
+		readData = append(readData, chunk...)
+	}
+	println(readData) // TODO: DEBUG
 	err := reFl(readData, 0)
+	print(err)
 	println(">>>Verifying storage integrity...")
 	checkErrorStorage(err)
 	println("Done!")
