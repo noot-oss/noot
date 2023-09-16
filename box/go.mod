@@ -1,6 +1,6 @@
 module github.com/fwuffyboi/noot
 
-go 1.20
+go 1.21
 
 require tinygo.org/x/drivers v0.25.0
 
