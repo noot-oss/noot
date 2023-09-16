@@ -1,6 +1,4 @@
-# NootBOX/NootWEB/NootAPI.
-
----
+# NootBOX/NootWEB/NootAPI/The Noot CLI Tool
 
 ### About Noot
 TODO: Write this section.
