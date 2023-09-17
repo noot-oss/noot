@@ -11,24 +11,24 @@ const (
 
 // This prints a fuckton of info about storage to terminal or wherever the fuck println goes
 func storageInfo() {
-	println("Flash data start:       ", machine.FlashDataStart())
-	println("Flash data end:         ", machine.FlashDataEnd())
-	println("Flash data size, bytes: ", machine.Flash.Size())
-	println("Flash write block size: ", machine.Flash.WriteBlockSize())
-	println("Flash erase block size: ", machine.Flash.EraseBlockSize())
+	println("INFO:   Flash data start:       ", machine.FlashDataStart())
+	println("INFO:   Flash data end:         ", machine.FlashDataEnd())
+	println("INFO:   Flash data size, bytes: ", machine.Flash.Size())
+	println("INFO:   Flash write block size: ", machine.Flash.WriteBlockSize())
+	println("INFO:   Flash erase block size: ", machine.Flash.EraseBlockSize())
 	println()
 
 }
 
 // Read and return all of what is currently stored onboard.
 func readAllStorage() string {
-	println("Reading all contents of onboard flash storage...")
+	println("FLSH:   Reading all contents of onboard flash storage...")
 	// Determine the size of the flash memory
-	println(">Determining flash size...")
+	println("FLSH:   >Determining flash size...")
 	flashSize := machine.Flash.Size()
 
 	// Read flash contents into a byte slice of the appropriate size
-	println(">>Reading flash contents...")
+	println("FLSH:   >>Reading flash contents...")
 
 	// used chatgpt, I hope this shit works
 	readData := make([]byte, 0) // Initialize an empty byte slice
@@ -36,9 +36,9 @@ func readAllStorage() string {
 		// Read a chunk of data
 		chunkSize := min(flashBlockSize, flashSize-offset)
 		chunk := make([]byte, chunkSize)
-		err := readFlash(chunk, offset)
+		err := reFl(chunk, offset)
 		if err != nil {
-			checkError(err)
+			checkErrorStorage(err)
 			break
 		}
 		// Append the chunk to the readData slice
@@ -47,35 +47,35 @@ func readAllStorage() string {
 	println(readData) // TODO: DEBUG
 	err := reFl(readData, 0)
 	print(err)
-	println(">>>Verifying storage integrity...")
+	println("FLSH:   >>>Verifying storage integrity...")
 	checkErrorStorage(err)
-	println("Done!")
-	println("Returning string... Done!")
+	println("FLSH:   Done!")
+	println("FLSH:   Returning string... Done!")
 	return string(readData)
 }
 
 func writeAllStorage(stringToWrite string) {
 	// this writes over all storage
 	// remove all stored data
-	println("Overwriting all contents of onboard flash storage...")
-	println(">Erasing...")
+	println("FLSH:   Overwriting all contents of onboard flash...")
+	println("FLSH:   >>Erasing...")
 	err := eraseAllBlocks() // erase all blocks
-	println(">>>Verifying storage integrity!")
+	println("FLSH:   >>>Verifying storage integrity...")
 	checkErrorStorage(err)
 	// Write data to flash memory
-	println(">>Writing...")
+	println("FLSH:   >>>>Writing...")
 	err = wrFl([]byte(stringToWrite), 0)
-	println(">>>Verifying storage integrity!")
+	println("FLSH:   >>>>>Verifying storage integrity...")
 	checkErrorStorage(err)
-	println("Done!")
+	println("FLSH:   Done!")
 }
 
 func eraseAllBlocks() error {
-	println("Deleting all contents of onboard flash storage...")
-	println(">Erasing selected blocks(" + ")...")
+	println("FLSH:   Deleting all contents of onboard flash storage...")
+	println("FLSH:   >Erasing selected blocks(" + ")...")
 	err := machine.Flash.EraseBlocks(0, machine.Flash.Size()/machine.Flash.EraseBlockSize()) // erase all blocks
-	println("Done!")
-	println("Returning error variable... Done!")
+	println("FLSH:   Done!")
+	println("FLSH:   Returning error variable... Done!")
 	return err
 }
 
@@ -83,7 +83,7 @@ func eraseAllBlocks() error {
 func checkErrorStorage(err error) {
 	if err != nil {
 		for {
-			println(err.Error())
+			println("CHSE:   " + err.Error())
 			time.Sleep(time.Second)
 		}
 	}

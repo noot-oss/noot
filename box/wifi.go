@@ -7,8 +7,9 @@ import (
 )
 
 // Wait for user to open serial console
-func waitSerialWifi() {
+func waitSerial() {
 	for !machine.Serial.DTR() {
+		println("OTHE:   Waiting for serial connection...")
 		time.Sleep(100 * time.Millisecond)
 	}
 }
@@ -23,5 +24,5 @@ func displayIP(adaptor *wifinina.Device) {
 }
 
 func wifiMessage(msg string) {
-	println(msg, "\r")
+	println("WIFI:   ", msg, "\r")
 }

@@ -34,7 +34,7 @@ var spi = machine.NINA_SPI   // These are the default pins for the Arduino Nano3
 var adaptor *wifinina.Device // This is the ESP chip that has the WIFININA firmware flashed on it
 
 func setupWifi() {
-
+	println("WIFI:  Initialising the Wi-Fi module...")
 	// Configure SPI for 8Mhz, Mode 0, MSB First
 	spi.Configure(machine.SPIConfig{
 		Frequency: 8 * 1e6,
@@ -42,12 +42,15 @@ func setupWifi() {
 		SDI:       machine.NINA_SDI,
 		SCK:       machine.NINA_SCK,
 	})
+	println("WIFI:  >Creating a new Wi-Fi adaptor...")
 
 	adaptor = wifinina.New(spi,
 		machine.NINA_CS,
 		machine.NINA_ACK,
 		machine.NINA_GPIO0,
-		machine.NINA_RESETN)
+		machine.NINA_RESETN
+	)
+	println("WIFI:  >>Configuring up the Wi-Fi module...")
 	adaptor.Configure()
 }
 
@@ -76,14 +79,16 @@ func connectToAP() {
 }
 
 func main() {
-	println("WIFI:  >>Waiting for serial connection...")
-	waitSerialWifi()
+	waitSerial()
 	// IMPORTANT CONSTANT VARIABLES. CHECK THESE BEFORE EVERY COMMIT.
-	VERSION := "V0.2.8"
+	const VERSION = "V0.2.9" // The version of the NootBOX software.
 	println("Application start at " + time.Now().String() + ".")
 	println("Waiting 3 seconds...")
 	time.Sleep(3 * time.Second)
 
+	storageInfo() // print a fuck ton of info about storage
+
+	// TODO: DEBUG FUNC
 	println("for loop goes: \n1: write, 2: read, 3: erase")
 	for {
 		writeAllStorage("This is test: " + time.Now().String())
@@ -93,12 +98,8 @@ func main() {
 		time.Sleep(500 * time.Millisecond)
 	}
 
-	println("FLSH:  Storage information: ")
-	storageInfo()
-
-	println("WIFI:  Initialising the Wi-Fi module...")
-	println("WIFI:  >Setting up the Wi-Fi module...")
 	setupWifi()
+	displayIP(adaptor)
 
 	// TODO: LOGGING TO FILE/NOOTWEB
 	// initiate the logging
