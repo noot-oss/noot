@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// TODO: Switch to https://github.com/tinygo-org/tinyfs/blob/release/examples/console/littlefs/machine/main.go
+// TODO: Use https://github.com/tinygo-org/tinyfs/blob/release/examples/console/example.go#L378 for help
+
 const (
 	flashBlockSize = 4096 // Set a reasonable block size based on your flash memory
 )
