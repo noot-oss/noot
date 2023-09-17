@@ -48,8 +48,7 @@ func setupWifi() {
 		machine.NINA_CS,
 		machine.NINA_ACK,
 		machine.NINA_GPIO0,
-		machine.NINA_RESETN
-	)
+		machine.NINA_RESETN)
 	println("WIFI:  >>Configuring up the Wi-Fi module...")
 	adaptor.Configure()
 }
