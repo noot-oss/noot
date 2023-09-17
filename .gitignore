@@ -28,3 +28,6 @@ boxInfo.noot
 
 # tinygo binary (i think...??)
 *.elf
+
+# non-complete nootbox-adn
+*nootbox-adn
