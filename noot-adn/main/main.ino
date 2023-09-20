@@ -9,8 +9,6 @@
 #include <Arduino.h>
 #include <SensirionI2CScd4x.h>
 #include <Wire.h>
-#include <Arduino_JSON.h>
-#include <HttpClient.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
 
