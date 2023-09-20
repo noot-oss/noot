@@ -129,8 +129,10 @@ void setup() {
       while (client.connected()) {  // this should be fucking obvious
         if (client.available()) {
 
-          char c = client.read();
-          Serial.write(c);
+          int read = client.read();
+          Serial.write(read);
+
+          String c = String(read);
           
           if (c == "\n") {  // if byte is newline
             // if the current line is blank, you got two newline characters in a row.
@@ -173,8 +175,9 @@ void setup() {
 
             client.println("");
           }
+        }
       }
-    } 
+    }
   }
 
   // we are enrolled
