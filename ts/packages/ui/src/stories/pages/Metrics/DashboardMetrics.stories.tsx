@@ -1,6 +1,12 @@
 import { PageWrapper } from "~ui/components/PageWrapper";
 import { DashboardMetricsInnerPage } from "../../../pages/Dashboard/Metrics/DashboardMetricsInnerPage";
-import { mockBoxData, mockCurrentData, mockTrackerData } from "./data";
+import {
+  alternateLineGraphChartData,
+  mockBoxData,
+  mockCurrentData,
+  mockLineGraphChartData,
+  mockTrackerData,
+} from "./data";
 
 export const DashboardMetricsStory = () => (
   <PageWrapper>
@@ -9,6 +15,10 @@ export const DashboardMetricsStory = () => (
       currentData={mockCurrentData}
       boxData={mockBoxData}
       userBoxesCount={2}
+      lineGraphData={{
+        ...mockLineGraphChartData,
+        data: alternateLineGraphChartData,
+      }}
     />
   </PageWrapper>
 );

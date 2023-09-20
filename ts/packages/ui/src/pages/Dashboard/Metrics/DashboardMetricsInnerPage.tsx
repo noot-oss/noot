@@ -39,6 +39,7 @@ export interface MetricsProps {
   currentData: CurrentData;
   boxData: BoxData;
   userBoxesCount: number;
+  lineGraphData: LineGraphAllDataProps;
 }
 
 const NumberMetricCard = (props: {
@@ -61,14 +62,20 @@ const NumberMetricCard = (props: {
   </Card>
 );
 
-const LineGraphAllData = () => (
+export interface LineGraphAllDataProps {
+  data: any[];
+  categories: string[];
+  index: string;
+}
+
+const LineGraphAllData = (props: LineGraphAllDataProps) => (
   <Card className={"h-full"}>
     <Title>All metrics over time</Title>
     <LineChart
       className="mt-6"
-      data={[]}
-      index="year"
-      categories={["Export Growth Rate", "Import Growth Rate"]}
+      data={props.data}
+      index={props.index}
+      categories={props.categories}
       colors={["emerald", "gray"]}
       yAxisWidth={40}
     />
@@ -128,7 +135,7 @@ export const DashboardMetricsInnerPage = (props: MetricsProps) => {
         <UptimeTracker data={props.uptimeTrackerData} />
 
         <Col numColSpan={1} numColSpanLg={3}>
-          <LineGraphAllData />
+          <LineGraphAllData {...props.lineGraphData} />
         </Col>
 
         <Col numColSpan={1}>
