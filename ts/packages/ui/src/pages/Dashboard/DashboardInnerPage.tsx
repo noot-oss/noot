@@ -108,6 +108,11 @@ export const DashboardInnerPage = (props: DashboardInnerPageProps) => {
   return (
     <>
       <DashboardMetricsInnerPage
+        lineGraphData={{
+          data: [],
+          index: "",
+          categories: [],
+        }}
         uptimeTrackerData={[]}
         // We know there is only one box from the checks above
         userBoxesCount={1}
