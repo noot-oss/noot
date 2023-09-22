@@ -44,6 +44,11 @@ const DashboardOwnPage = async ({
 
   return (
     <DashboardMetricsInnerPage
+      lineGraphData={{
+        data: [],
+        index: "",
+        categories: [],
+      }}
       uptimeTrackerData={[]}
       currentData={{
         co2: {
