@@ -82,7 +82,7 @@ jobs:
 
       - name: Install deps
         run: bun install
-        working-directory: "ts/apps/boxServe"
+        working-directory: "ts"
 
       - name: Build
         run: bun run build
