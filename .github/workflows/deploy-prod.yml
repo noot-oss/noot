@@ -85,7 +85,7 @@ jobs:
         working-directory: "ts/apps/boxServe"
 
       - name: Build
-        run: bun build
+        run: bun run build
         working-directory: "ts/apps/boxServe"
 
       - name: Deploy
