@@ -19,5 +19,8 @@
     "overrides": {
       "@babel/core": "7.22.17"
     }
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
