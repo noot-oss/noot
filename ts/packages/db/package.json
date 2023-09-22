@@ -1,7 +1,7 @@
 {
   "name": "@noot/db",
   "scripts": {
-    "postinstall": "prisma generate"
+    "postinstall": "bun run prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.2.0",
