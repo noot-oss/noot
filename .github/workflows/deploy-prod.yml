@@ -27,7 +27,7 @@ jobs:
       uses: oven-sh/setup-bun@v1
 
     - name: Install temp SST build
-      run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && ls && bun install && bun link
+      run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git . && bun install && bun link
 
     - name: Install deps
       run: bun link sst && bun install
@@ -61,7 +61,7 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - name: Install temp SST build
-        run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && bun install && bun link
+        run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git . && bun install && bun link
 
       - name: Install deps
         run: bun link sst && bun install
@@ -87,7 +87,7 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - name: Install temp SST build
-        run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && bun install && bun link
+        run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git . && bun install && bun link
 
       - name: Install deps
         run: bun link sst && bun install
@@ -115,7 +115,7 @@ jobs:
         uses: oven-sh/setup-bun@v1
 
       - name: Install temp SST build
-        run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && bun install && bun link
+        run: mkdir sst-bun-temp-dist && cd sst-bun-temp-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git . && bun install && bun link
 
       - name: Install deps
         run: bun link sst && bun install
