@@ -13,9 +13,5 @@
     "prettier": "^2.8.8",
     "turbo": "latest"
   },
-  "name": "ts",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ]
+  "name": "ts"
 }
