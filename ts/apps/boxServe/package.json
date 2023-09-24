@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@noot/tailwind-config": "link:@noot/tailwind-config",
-    "@noot/ui": "link:@noot/ui"
+    "@noot/ui": "link:@noot/ui",
+    "react": "^18.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.3.2",
