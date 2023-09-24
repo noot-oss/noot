@@ -126,13 +126,13 @@ jobs:
       - name: Install bun
         uses: oven-sh/setup-bun@v1
 
-      - name: Install temp SST build
-        run: mkdir temp-sst-bun-dist && cd temp-sst-bun-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && cd temp-sst-bun-dist && bun install && bun link
+      #- name: Install temp SST build
+      #  run: mkdir temp-sst-bun-dist && cd temp-sst-bun-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && cd temp-sst-bun-dist && bun install && bun link
 
 
       - name: Install deps
-        run: bun link sst && bun install
-        working-directory: "ts"
+        run: bun install
+        working-directory: "ts/apps/docs-web"
 
       - name: Build
         run: bun run build
