@@ -31,11 +31,11 @@ jobs:
 
     - name: Install deps
       run: bun link sst && bun install
-      working-directory: "ts"
+      working-directory: "ts/apps/web"
 
-    - name: Move node_modules
-      run: rm -rf ./node_modules/eslint && rm -rf ./node_modules/@typescript-eslint && cp -r ./node_modules/* ./apps/web/node_modules/ && rm -rf ./node_modules/next
-      working-directory: "ts"
+   # - name: Move node_modules
+    #  run: rm -rf ./node_modules/eslint && rm -rf ./node_modules/@typescript-eslint && cp -r ./node_modules/* ./apps/web/node_modules/ && rm -rf ./node_modules/next
+     # working-directory: "ts"
 
     - name: Deploy
       run: |
