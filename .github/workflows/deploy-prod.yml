@@ -34,7 +34,8 @@ jobs:
       working-directory: "ts"
 
     - name: Move node_modules
-      run: mv -p node_modules ts/apps/web
+      run: mkdir ts/apps/web/node_modules && mv node_modules ts/apps/web
+      working-directory: "ts"
 
     - name: Deploy
       run: |
