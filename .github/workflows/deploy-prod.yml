@@ -34,7 +34,7 @@ jobs:
       working-directory: "ts"
 
     - name: Move node_modules
-      run: cp -r ./node_modules/* ./apps/web/node_modules/
+      run: \cp -f -r ./node_modules/* ./apps/web/node_modules/
       working-directory: "ts"
 
     - name: Deploy
