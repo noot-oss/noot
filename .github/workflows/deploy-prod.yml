@@ -30,7 +30,7 @@ jobs:
       run: mkdir temp-sst-bun-dist && cd temp-sst-bun-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && cd temp-sst-bun-dist && bun install && bun pm ls --all && bun link
 
     - name: Install deps
-      run: cd packages/ui && bun link && cd ../db && bun link && cd ../tailwind-config && bun link && cd ../../apps/web && bun link sst && bun install
+      run: cd packages/eslint-config-custom && bun link && cd ../ui && bun link && bun install && cd ../db && bun link && bun install && cd ../tailwind-config && bun link && bun install && cd ../../apps/web && bun link sst && bun install
       working-directory: "ts"
 
    # - name: Move node_modules
