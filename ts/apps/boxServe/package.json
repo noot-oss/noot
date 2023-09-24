@@ -10,8 +10,8 @@
     "deploy": "wrangler pages deploy dist --project-name=noot-serve"
   },
   "dependencies": {
-    "@noot/tailwind-config": "workspace:*",
-    "@noot/ui": "workspace:*"
+    "@noot/tailwind-config": "link:@noot/tailwind-config",
+    "@noot/ui": "link:@noot/ui"
   },
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.3.2",
