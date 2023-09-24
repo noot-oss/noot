@@ -103,7 +103,7 @@ jobs:
 
       - name: Install deps
         run: bun link sst && bun install
-        working-directory: "ts"
+        working-directory: "ts/apps/boxServe"
 
       - name: Build
         run: bun run build
