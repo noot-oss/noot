@@ -98,7 +98,7 @@ jobs:
         run: mkdir temp-sst-bun-dist && cd temp-sst-bun-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && cd temp-sst-bun-dist && bun install && bun link
 
       - name: Install deps
-        run: cd packages/ui && bun link && bun install && cd ../tailwind-config && bun link && bun install && cd ../../apps/boxServe && bun link sst && bun install
+        run: cd packages/ui && bun link && bun install && cd ../tailwind-config && bun link && bun install
         working-directory: "ts"
 
       - name: Install deps
