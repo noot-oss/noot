@@ -2,6 +2,8 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
+import {PrismaPlugin} from "@prisma/nextjs-monorepo-workaround-plugin";
+
 await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
@@ -18,7 +20,14 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
-  transpilePackages: ["@noot/ui"]
+  transpilePackages: ["@noot/ui"],
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()]
+    }
+
+    return config
+  },
 };
 
 export default config;
