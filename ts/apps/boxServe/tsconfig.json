@@ -5,13 +5,19 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "~web/*": ["./apps/web/src/*"],
+      "~ui/components/*": ["./packages/ui/src/components/*"],
+      "~ui/lib/*": ["./packages/ui/src/lib/*"]
+    },
+    "baseUrl": "../../"
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    "../../packages/ui/src/**/*.{ts,tsx}"
+    "../../packages/ui/src/**/*.{ts,tsx}",
   ],
 }
