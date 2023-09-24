@@ -33,6 +33,9 @@ jobs:
       run: bun link sst && bun install
       working-directory: "ts"
 
+    - name: Move node_modules
+      run: mv -p node_modules ts/apps/web
+
     - name: Deploy
       run: |
         touch .env.local
