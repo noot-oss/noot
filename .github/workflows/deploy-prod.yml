@@ -67,14 +67,17 @@ jobs:
       - name: Install temp SST build
         run: mkdir temp-sst-bun-dist && cd temp-sst-bun-dist && git init && git clone https://github.com/noot-oss/temp-sst-bun-dist.git && cd temp-sst-bun-dist && bun install && bun link
 
+      - name: Link eslint
+        run: cd packages/eslint-config-custom && bun link
+        working-directory: "ts"
 
       - name: Install deps
-        run: bun link sst && bun install
+        run: bun link eslint-config-custom && bun link sst && bun install
         working-directory: "ts/apps/api"
 
       - name: Deploy
-        run: cd apps/api && bun run deploy
-        working-directory: "ts"
+        run: bun run deploy
+        working-directory: "ts/apps/api"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
