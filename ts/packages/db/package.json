@@ -1,7 +1,7 @@
 {
   "name": "@noot/db",
   "scripts": {
-    "postinstall": "bun run prisma generate"
+    "postinstall": "dotenv-cli -v PRISMA_CLIENT_OUTPUT=./temp-prisma -- bun run prisma generate"
   },
   "dependencies": {
     "@prisma/client": "5.3.1",
