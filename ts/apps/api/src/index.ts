@@ -4,7 +4,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import { PrismaClient } from "@prisma/client/edge";
+import { PrismaClient } from "../prisma";
 
 type EnvVars = {
   UPSTASH_REDIS_REST_URL: string;
@@ -55,7 +55,7 @@ app.use("*", async (context, next) => {
     );
   }
 
-  const { success } = await ratelimit.limit(ip);
+  const { success } = await ratelimit.limit(ip ?? "IS_DEV");
 
   if (!success) {
     return context.json(
