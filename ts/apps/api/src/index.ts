@@ -44,7 +44,9 @@ app.use("*", async (context, next) => {
   const finalIp = context.req.headers.get("x-forwarded-for");
   const ip = cfIp || primaryIp || finalIp;
 
-  if (!ip) {
+  console.log("is dev", isDev);
+
+  if (!ip && !isDev) {
     return context.json(
       {
         error: "No IP address",

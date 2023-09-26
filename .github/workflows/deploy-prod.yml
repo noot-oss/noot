@@ -53,6 +53,7 @@ jobs:
         UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         WEB_SITE_AWS_ARN: ${{ secrets.WEB_SITE_AWS_ARN }}
         NEXT_PUBLIC_UMAMI_CODE: ${{ secrets.NEXT_PUBLIC_UMAMI_CODE }}
+        PRISMA_CLIENT_OUTPUT: ${{ secrets.PRISMA_CLIENT_OUTPUT }}
   deploy_api:
     name: Deploy API
     runs-on: ubuntu-latest
@@ -83,6 +84,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          PRISMA_CLIENT_OUTPUT: ${{ secrets.PRISMA_CLIENT_OUTPUT }}
   deploy_box_serve:
     name: Deploy Box Serve
     runs-on: ubuntu-latest
