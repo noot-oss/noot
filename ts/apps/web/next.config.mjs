@@ -3,6 +3,7 @@
  * for Docker builds.
  */
 import {PrismaPlugin} from "@prisma/nextjs-monorepo-workaround-plugin";
+import CopyPlugin from "copy-webpack-plugin";
 
 await import("./src/env.mjs");
 
@@ -27,7 +28,7 @@ const config = {
     }
 
     return config
-  },
+  }
 };
 
 export default config;
