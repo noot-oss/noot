@@ -1,4 +1,4 @@
-@import "../../../../packages/tailwind-config/styles.css";
+@import "@noot/tailwind-config/styles.css";
 
 html {
     height: 100%;
