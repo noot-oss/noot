@@ -1,4 +1,4 @@
-import { PrismaClient } from "./prisma";
+import { PrismaClient } from "./temp-prisma";
 import { Redis } from "@upstash/redis";
 
 const globalForPrisma = globalThis as unknown as {
