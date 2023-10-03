@@ -50,7 +50,7 @@ void setup() {
   Serial.println(
     "[INFO]   This program comes with ABSOLUTELY NO WARRANTY; "
     "[INFO]   This is free software, and you are welcome to redistribute it under certain conditions."
-    "[INFO]   For details visit https://github.com/Noot-OSS/Noot/blob/main/LICENSE."
+    "[INFO]   For details visit https://github.com/Noot-OSS/Noot/blob/main/LICENSE ."
   );
 
   // test if the wifi module is even fucking THERE
@@ -96,9 +96,16 @@ void setup() {
   Serial.println(("[WIFI]   Status:              ", wifiStatus));
   Serial.println(("[WIFI]   Connected to:        ", WIFI_SSID));
   Serial.println(("[WIFI]   Local IP-address is: ", localIP));
+  bool enrolled = false;
+
+  String token = EEPROM.get("noot-token")
+
+  if (token) {
+    // Send check api call to api
+    // If returns OK, we can start the environment loop!
+  }
 
   // check if enrolled to NootWeb
-  bool enrolled = false;
   Serial.println("[OTHE]   Assuming NootBox is unenrolled.");
   Serial.println("[OTHE]   Attempting to check if NootBox is enrolled...");
   
@@ -150,7 +157,7 @@ void setup() {
 
               // send blank line to break response.
               client.println();
-
+              
               // break out of loop
               break;
             } else {  // if you got a newline, clear clientDataString
