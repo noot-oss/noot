@@ -87,16 +87,6 @@ func main() {
 
 	storageInfo() // print a fuck ton of info about storage
 
-	// TODO: DEBUG FUNC
-	println("for loop goes: \n1: write, 2: read, 3: erase")
-	for {
-		writeAllStorage("This is test: " + time.Now().String())
-		println(readAllStorage())
-		eraseAllBlocks()
-		println(readAllStorage())
-		time.Sleep(500 * time.Millisecond)
-	}
-
 	setupWifi()
 	displayIP(adaptor)
 
