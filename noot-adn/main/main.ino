@@ -21,13 +21,13 @@ int wifiStatus = WL_IDLE_STATUS;  // wifi radio status
 IPAddress localIP;                // stores local ip address
 const char NOOT_API_DOMAIN[] = "api.noot.site";
 
-bool shouldSendMeasurements = false
+bool shouldSendMeasurements = false;
 
 // enrollment server
 WiFiServer server(17002);
 
 WiFiClient client;
-HttpClient http = HttpClient(client, NOOT_API_DOMAIN, 80)
+HttpClient http = HttpClient(client, NOOT_API_DOMAIN, 80);
 
 // eeprom
 byte eepromJson;  // stores the shit from eeprom
@@ -113,35 +113,75 @@ void setup() {
     Serial.println("[OTHE]   Attempting to check if NootBox is enrolled...");
   }
 
-  http.connect()
-
   // check if enrolled to NootWeb
   // Send check api call to api
   // If returns OK, we can start the environment loop!
-  // if (client.connect(NOOT_API_DOMAIN, 80)) {
-  http.get("/check?token=" + token)
-  client.println("GET /check?" + token + " HTTP/1.1");
-  client.println(String("Host: ") + NOOT_API_DOMAIN);
-  client.println("Connection: close");
-  client.println();
-  // }
-
-  client.read()
-  
-  // we are not enrolled
-  // ask nootweb if my device serial number exists on their database
-  // TODO:
-
-  // its on there: ?????
+  http.get("/check?token=" + token);
+  if (http.responseStatusCode() == 200) {
+    shouldSendMeasurements = true;
+    return;
+  }
 
   // its not on there: enroll myself as a new box
   startWebserver();
 
-  // we are enrolled
-  
 
+  
+  // continue to loop()
+}
+
+void loop() {
+  uint16_t error;
+  char errorMessage[256];
+
+  if (!shouldSendMeasurements) {
+    return;
+  }
+  delay(100);
+
+  uint16_t co2 = 0;
+  float temperature = 0.0f;
+  float humidity = 0.0f;
+  bool isDataReady = false;
+
+  error = scd4x.getDataReadyFlag(isDataReady);
+  if (error) {
+    Serial.println("[ERROR]   Error checking if data is ready.");
+    errorToString(error, errorMessage, 256);
+    Serial.println(errorMessage);
+    return;
+  }
+
+  if (!isDataReady) {
+    return;
+  }
+
+  error = scd4x.readMeasurement(co2, temperature, humidity);
+  if (error) {
+    Serial.println("[ERROR]   Error reading data.");
+    errorToString(error, errorMessage, 256);
+    Serial.println(errorMessage);
+    return;
+  }
+
+  if (co2 == 0) {
+    Serial.println("[ERROR]   Error reading co2 data.");
+    return;
+  }
+
+  http.post("/push", "json", "{}");
+
+  // take measurements from sensor
+
+  // upload to nootweb
+
+  // TODO: Attempt to grab OTA updates every 60 minutes (https://arduino-pico.readthedocs.io/en/latest/ota.html#http-server)
+}
+
+void startMeasurements() {
   // stop potentially previously started measurement
   Serial.println("[SNSR]   Attempting to stop potential previous measurements...");
+  shouldSendMeasurements = true;
   scdError = scd4x.stopPeriodicMeasurement();
   if (scdError) {
     errorToString(scdError, scdErrMessage, 256);
@@ -149,19 +189,8 @@ void setup() {
   } else {
     Serial.println("[SNSR]   Done.");
   }
-  
-  // continue to loop()
-}
 
-void loop() {
-  while (shouldSendMeasurements) {
-
-  }
-  // take measurements from sensor
-
-  // upload to nootweb
-
-  // TODO: Attempt to grab OTA updates every 60 minutes (https://arduino-pico.readthedocs.io/en/latest/ota.html#http-server)
+  scd4x.startPeriodicMeasurement();
 }
 
 void startWebserver() {
