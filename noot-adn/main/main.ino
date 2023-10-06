@@ -11,6 +11,7 @@
 #include <Wire.h>
 #include <Ethernet.h>
 #include <EthernetClient.h>
+#include <ArduinoHttpClient.h>
 
 //wifi
 // TODO: Find a way to keep WIFI_PASS private.
@@ -18,9 +19,15 @@ char WIFI_SSID[] = "default";     // network ssid (dug)
 char WIFI_PASS[] = "default";     // network password (duh x2)
 int wifiStatus = WL_IDLE_STATUS;  // wifi radio status
 IPAddress localIP;                // stores local ip address
+const char NOOT_API_DOMAIN[] = "api.noot.site";
+
+bool shouldSendMeasurements = false
 
 // enrollment server
 WiFiServer server(17002);
+
+WiFiClient client;
+HttpClient http = HttpClient(client, NOOT_API_DOMAIN, 80)
 
 // eeprom
 byte eepromJson;  // stores the shit from eeprom
@@ -32,7 +39,6 @@ uint16_t scdError;
 
 
 const char VERSION[] = "V0.1.0";  // version of this clusterfuck excuse of a piece of software
-
 
 void setup() {
   // Setup serial; comms
@@ -98,22 +104,30 @@ void setup() {
   Serial.println(("[WIFI]   Local IP-address is: ", localIP));
   bool enrolled = false;
 
-  String token = EEPROM.get("noot-token")
+  // read from eeprom
+  // parse data to get NW creds
+  String token = String(EEPROM.read(0));
 
-  if (token) {
-    // Send check api call to api
-    // If returns OK, we can start the environment loop!
+  if (!token) {
+    Serial.println("[OTHE]   Assuming NootBox is unenrolled.");
+    Serial.println("[OTHE]   Attempting to check if NootBox is enrolled...");
   }
 
-  // check if enrolled to NootWeb
-  Serial.println("[OTHE]   Assuming NootBox is unenrolled.");
-  Serial.println("[OTHE]   Attempting to check if NootBox is enrolled...");
-  
-  // read from eeprom
-  // TODO:
-  // parse data to get NW creds
-  // TODO:
+  http.connect()
 
+  // check if enrolled to NootWeb
+  // Send check api call to api
+  // If returns OK, we can start the environment loop!
+  // if (client.connect(NOOT_API_DOMAIN, 80)) {
+  http.get("/check?token=" + token)
+  client.println("GET /check?" + token + " HTTP/1.1");
+  client.println(String("Host: ") + NOOT_API_DOMAIN);
+  client.println("Connection: close");
+  client.println();
+  // }
+
+  client.read()
+  
   // we are not enrolled
   // ask nootweb if my device serial number exists on their database
   // TODO:
@@ -121,69 +135,7 @@ void setup() {
   // its on there: ?????
 
   // its not on there: enroll myself as a new box
-  server.begin();  // start server
-
-  while (!enrolled) {
-    WiFiClient client = server.available();
-
-    if (client) {  // Yay! uwu~ someone joined our servery wervery! nyaaaa~~
-      Serial.println("[SERV]   A new client has connected.");
-
-      String clientDataString = "";
-
-      while (client.connected()) {  // this should be fucking obvious
-        if (client.available()) {
-
-          int read = client.read();
-          Serial.write(read);
-
-          String c = String(read);
-          
-          if (c == "\n") {  // if byte is newline
-            // if the current line is blank, you got two newline characters in a row.
-
-            // that's the end of the client HTTP request, so send a response:
-
-            if (clientDataString.length() == 0) {
-              // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-              // and a content-type so the client knows what's coming, then a blank line:
-
-              client.println("HTTP/1.1 200 OK");          // header and status code
-              client.println("Content-type:text/html");   // content type smh
-              client.println();                           // empty newline for seperation
-
-              // TODO: finish html
-              client.println("<h1>Hello! This is NootBox.</h1>"); // send html here.
-
-              // send blank line to break response.
-              client.println();
-              
-              // break out of loop
-              break;
-            } else {  // if you got a newline, clear clientDataString
-              clientDataString = "";
-            }
-        
-
-          } else if (c != "\r") {  // if got anything else but a carrige return character
-            clientDataString += c; // add it to end
-            Serial.println(clientDataString); // TODO: debug
-          }
-
-          // check for paths here.
-          if (clientDataString.endsWith("POST /pinsubmit")) {  // api route
-            // submit to nootweb
-            Serial.println(("[SERV]   Sending recieved code (", clientDataString, ") to NootWeb."));
-
-            // sending code
-            // TODO: Send code to nootweb.
-
-            client.println("");
-          }
-        }
-      }
-    }
-  }
+  startWebserver();
 
   // we are enrolled
   
@@ -202,9 +154,76 @@ void setup() {
 }
 
 void loop() {
+  while (shouldSendMeasurements) {
+
+  }
   // take measurements from sensor
 
   // upload to nootweb
 
   // TODO: Attempt to grab OTA updates every 60 minutes (https://arduino-pico.readthedocs.io/en/latest/ota.html#http-server)
+}
+
+void startWebserver() {
+  server.begin();  // start server
+
+  WiFiClient client = server.available();
+
+  if (client) {  // Yay! uwu~ someone joined our servery wervery! nyaaaa~~
+    Serial.println("[SERV]   A new client has connected.");
+
+    String clientDataString = "";
+
+    while (client.connected()) {  // this should be fucking obvious
+      if (client.available()) {
+
+        int read = client.read();
+        Serial.write(read);
+
+        String c = String(read);
+        
+        if (c == "\n") {  // if byte is newline
+          // if the current line is blank, you got two newline characters in a row.
+
+          // that's the end of the client HTTP request, so send a response:
+
+          if (clientDataString.length() == 0) {
+            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
+            // and a content-type so the client knows what's coming, then a blank line:
+
+            client.println("HTTP/1.1 200 OK");          // header and status code
+            client.println("Content-type:text/html");   // content type smh
+            client.println();                           // empty newline for seperation
+
+            // TODO: finish html
+            client.println("<h1>Hello! This is NootBox.</h1>"); // send html here.
+
+            // send blank line to break response.
+            client.println();
+            
+            // break out of loop
+            break;
+          } else {  // if you got a newline, clear clientDataString
+            clientDataString = "";
+          }
+      
+
+        } else if (c != "\r") {  // if got anything else but a carrige return character
+          clientDataString += c; // add it to end
+          Serial.println(clientDataString); // TODO: debug
+        }
+
+        // check for paths here.
+        if (clientDataString.endsWith("POST /pinsubmit")) {  // api route
+          // submit to nootweb
+          Serial.println(("[SERV]   Sending recieved code (", clientDataString, ") to NootWeb."));
+
+          // sending code
+          // TODO: Send code to nootweb.
+
+          client.println("");
+        }
+      }
+    }
+  }
 }
