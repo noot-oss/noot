@@ -28,6 +28,8 @@ The NootBox program currently only supports two sensors. These are the [Adafruit
 An executable version of the NootBox program will be created and distributed with every NootBox application update/release. However, some users may choose to compile it themselves, that is also supported and will have very similar installation instructions.
 
 ### Noot's API
+Noot utilises Prisma and hono to produce an API which run's on the edge.
+
 TODO: Write this section.
 
 
